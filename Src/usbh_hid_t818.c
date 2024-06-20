@@ -4,7 +4,7 @@
 
 static USBH_StatusTypeDef USBH_HID_T818Decode(USBH_HandleTypeDef *phost);
 
-HID_T818_Info_TypeDef    t818_info;
+static HID_T818_Info_TypeDef    t818_info;
 
 uint8_t                  t818_report_data[T818_REPORT_SIZE];
 uint8_t                  t818_rx_report_buf[T818_REPORT_SIZE];
