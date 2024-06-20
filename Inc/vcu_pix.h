@@ -14,7 +14,7 @@
 #define INC_VCU_PIX_H_
 
 #include <stdint.h>
-#include <usbh_hid_t818.h>
+#include <t818_drive_control.h>
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
@@ -32,7 +32,7 @@ typedef uint8_t VCUPix_StatusTypeDef;
  * information about the current HID report from the T818 device.
  */
 typedef struct {
-    HID_T818_Info_TypeDef *t818_hid_report;  /**< Pointer to the T818 HID report */
+	t818_drive_control_t *t818_control;
 } vcu_pix_state_t;
 
 
