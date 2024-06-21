@@ -14,7 +14,7 @@
 
 /* Initialization of vcu_pix_state */
 static vcu_pix_state_t vcu_pix_state = {
-    .t818_control = NULL  /**< t818 control pointer initialized to NULL */
+    .t818_control = NULL  						/**< t818 control pointer initialized to NULL */
 };
 
 /* Constant pointer to the vcu_pix_state_t instance */
