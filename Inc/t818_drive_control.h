@@ -95,7 +95,7 @@ typedef struct {
 typedef struct {
 	HID_T818_Info_TypeDef *t818_info; /**< Pointer to the T818 info structure */
 	const t818_drive_control_config_t *config; /**< Pointer to the configuration structure */
-	t818_driving_commands_t *t818_driving_commands;
+	t818_driving_commands_t t818_driving_commands;
 } t818_drive_control_t;
 
 /* Defines ------------------------------------------------------------------*/
@@ -120,14 +120,11 @@ typedef struct {
 /*
  *
  */
-T818DriveControl_StatusTypeDef t818_driving_commands_init(
-		t818_driving_commands_t *t818_driving_commands);
 
 T818DriveControl_StatusTypeDef t818_drive_control_init(
 		t818_drive_control_t *t818_drive_control,
 		const t818_drive_control_config_t *t818_config,
-		HID_T818_Info_TypeDef *t818_info,
-		t818_driving_commands_t *t818_driving_commands);
+		HID_T818_Info_TypeDef *t818_info);
 
 T818DriveControl_StatusTypeDef t818_drive_control_update(
 		t818_drive_control_t *t818_drive_control);
@@ -137,7 +134,7 @@ inline T818DriveControl_StatusTypeDef t818_drive_control_get_driving_commands(
 		t818_driving_commands_t *t818_driving_commands) {
 	T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
 	if (t818_drive_control != NULL && t818_driving_commands != NULL) {
-		t818_driving_commands = t818_drive_control->t818_driving_commands;
+		*t818_driving_commands = t818_drive_control->t818_driving_commands;
 		status = T818_DC_OK;
 	}
 
