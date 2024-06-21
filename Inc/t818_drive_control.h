@@ -14,6 +14,7 @@
 #define INC_T818_DRIVE_CONTROL_H_
 
 #include <usbh_hid_t818.h>
+#include "button.h"
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
@@ -30,10 +31,60 @@ typedef uint8_t T818DriveControl_StatusTypeDef;
  * This structure contains the configuration parameters for the T818 Drive Control module.
  */
 typedef struct {
-    USBH_HandleTypeDef *t818_host_handle;   /**< Pointer to the USB host handle */
-    USBH_HID_StateTypeDef *t818_hid_state;  /**< Pointer to the HID state structure */
-    uint16_t wheel_range;                   /**< Wheel range value */
+	USBH_HandleTypeDef *t818_host_handle; /**< Pointer to the USB host handle */
+	USBH_HID_StateTypeDef *t818_hid_state; /**< Pointer to the HID state structure */
 } t818_drive_control_config_t;
+
+typedef enum {
+	DIRECTION_NONE,
+	DIRECTION_UP,
+	DIRECTION_DOWN,
+	DIRECTION_LEFT,
+	DIRECTION_RIGHT,
+	DIRECTION_UP_LEFT,
+	DIRECTION_UP_RIGHT,
+	DIRECTION_DOWN_LEFT,
+	DIRECTION_DOWN_RIGHT
+} DirectionalPadArrowPosition;
+
+typedef struct {
+	float wheel_steering_degree;
+	float braking_module;
+	float throttling_module;
+	float clutching_module;
+
+	button_t paddle_shifter_left;
+	button_t paddle_shifter_right;
+	button_t drink;
+	button_t radio;
+	button_t one_plus;
+	button_t ten_minus;
+	button_t sha;
+	button_t oil;
+
+	button_t parking;
+	button_t neutral;
+	button_t k1;
+	button_t k2;
+	button_t s1;
+	button_t left_side_wheel_up;
+	button_t left_side_wheel_down;
+	button_t right_side_wheel_up;
+
+	button_t right_side_wheel_down;
+	button_t grip_anticlockwise;
+	button_t grip_clockwise;
+	button_t eng_anticlockwise;
+	button_t eng_clockwise;
+	button_t button_22;
+	button_t button_23;
+	button_t grip;
+
+	button_t eng;
+
+	DirectionalPadArrowPosition pad_arrow_position;
+
+} t818_driving_commands_t;
 
 /**
  * @brief T818 Drive Control State Structure
@@ -42,10 +93,9 @@ typedef struct {
  * information about the current initialization status, wheel angle, and configuration.
  */
 typedef struct {
-    uint8_t initialized;                                  /**< Initialization status */
-    float wheel_angle;                                    /**< Current wheel angle */
-    // Additional fields: buttons, acceleration, braking, etc.
-    const t818_drive_control_config_t *config;            /**< Pointer to the configuration structure */
+	HID_T818_Info_TypeDef *t818_info; /**< Pointer to the T818 info structure */
+	const t818_drive_control_config_t *config; /**< Pointer to the configuration structure */
+	t818_driving_commands_t *t818_driving_commands;
 } t818_drive_control_t;
 
 /* Defines ------------------------------------------------------------------*/
@@ -67,16 +117,31 @@ typedef struct {
 #define T818_DC_ERROR                         ((T818DriveControl_StatusTypeDef) 1U)
 
 /* Function Prototypes ------------------------------------------------------*/
-/**
- * @brief Initialize the T818 Drive Control module.
+/*
  *
- * This function initializes the T818 Drive Control module, setting up the necessary
- * resources and configurations.
- *
- * @param t818_drive_control Pointer to the T818 drive control state structure.
- * @param t818_config Pointer to the T818 drive control configuration structure.
- * @return T818DriveControl_StatusTypeDef Status of the initialization.
  */
-T818DriveControl_StatusTypeDef t818_drive_control_init(t818_drive_control_t *t818_drive_control, const t818_drive_control_config_t *t818_config);
+T818DriveControl_StatusTypeDef t818_driving_commands_init(
+		t818_driving_commands_t *t818_driving_commands);
+
+T818DriveControl_StatusTypeDef t818_drive_control_init(
+		t818_drive_control_t *t818_drive_control,
+		const t818_drive_control_config_t *t818_config,
+		HID_T818_Info_TypeDef *t818_info,
+		t818_driving_commands_t *t818_driving_commands);
+
+T818DriveControl_StatusTypeDef t818_drive_control_update(
+		t818_drive_control_t *t818_drive_control);
+
+inline T818DriveControl_StatusTypeDef t818_drive_control_get_driving_commands(
+		t818_drive_control_t *t818_drive_control,
+		t818_driving_commands_t *t818_driving_commands) {
+	T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
+	if (t818_drive_control != NULL && t818_driving_commands != NULL) {
+		t818_driving_commands = t818_drive_control->t818_driving_commands;
+		status = T818_DC_OK;
+	}
+
+	return status;
+}
 
 #endif /* INC_T818_DRIVE_CONTROL_H_ */

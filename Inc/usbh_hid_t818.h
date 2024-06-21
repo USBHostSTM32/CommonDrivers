@@ -109,8 +109,12 @@ typedef struct _HID_T818_Info{
 /** @defgroup USBH_HID_T818_Exported_FunctionsPrototype
   * @{
   */
+//ADD DOXYGEN
 extern USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost);
-HID_T818_Info_TypeDef *USBH_HID_GetT818Info(USBH_HandleTypeDef *phost);
+//ADD DOXYGEN
+USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost);
+//ADD DOXYGEN
+HID_T818_Info_TypeDef* USBH_HID_T818GetInstance();
 /**
   * @}
   */

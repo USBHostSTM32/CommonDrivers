@@ -584,22 +584,24 @@ USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost)
   return USBH_OK;
 }
 
-/**
-  * @brief  USBH_HID_GetT818Info
-  *         The function return T818 information.
-  * @param  phost: Host handle
-  * @retval T818 information
-  */
-HID_T818_Info_TypeDef *USBH_HID_GetT818Info(USBH_HandleTypeDef *phost)
+//ADD DOXYGEN
+USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost)
 {
+	USBH_StatusTypeDef status=USBH_FAIL;
+
   if (USBH_HID_T818Decode(phost) == USBH_OK)
   {
-    return &t818_info;
+    status=USBH_OK;
   }
-  else
-  {
-    return NULL;
-  }
+
+  return status;
+
+}
+
+//ADD DOXYGEN
+HID_T818_Info_TypeDef* USBH_HID_T818GetInstance()
+{
+	return &t818_info;
 }
 
 
