@@ -19,36 +19,6 @@ static vcu_pix_state_t vcu_pix_state = {
         .braking_module = 0.0f,
         .throttling_module = 0.0f,
         .clutching_module = 0.0f,
-
-        .paddle_shifter_left = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .paddle_shifter_right = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .drink = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .radio = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .one_plus = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .ten_minus = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .sha = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .oil = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-
-        .parking = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .neutral = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .k1 = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .k2 = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .s1 = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .left_side_wheel_up = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .left_side_wheel_down = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .right_side_wheel_up = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-
-        .right_side_wheel_down = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .grip_anticlockwise = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .grip_clockwise = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .eng_anticlockwise = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .eng_clockwise = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .button_22 = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .button_23 = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-        .grip = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-
-        .eng = { .is_pressed = NULL, .actual_raw_state = BUTTON_NOT_PRESSED, .previous_raw_state = BUTTON_NOT_PRESSED, .state = BUTTON_NOT_PRESSED, .long_pressed_state = NOT_PRESSED, .start_pressing_time = 0U },
-
         .pad_arrow_position = DIRECTION_NONE
     }
 };

@@ -36,8 +36,36 @@ extern "C" {
 #define T818_ID_PRODUCT					(46742U)
 #define T818_REPORT_SIZE				(64)
 
+typedef enum {
+	BUTTON_PADDLE_SHIFTER_LEFT,
+	BUTTON_PADDLE_SHIFTER_RIGHT,
+	BUTTON_DRINK,
+	BUTTON_RADIO,
+	BUTTON_ONE_PLUS,
+	BUTTON_TEN_MINUS,
+	BUTTON_SHA,
+	BUTTON_OIL,
+	BUTTON_PARKING,
+	BUTTON_NEUTRAL,
+	BUTTON_K1,
+	BUTTON_K2,
+	BUTTON_S1,
+	BUTTON_LEFT_SIDE_WHEEL_UP,
+	BUTTON_LEFT_SIDE_WHEEL_DOWN,
+	BUTTON_RIGHT_SIDE_WHEEL_UP,
+	BUTTON_RIGHT_SIDE_WHEEL_DOWN,
+	BUTTON_GRIP_ANTICLOCKWISE,
+	BUTTON_GRIP_CLOCKWISE,
+	BUTTON_ENG_ANTICLOCKWISE,
+	BUTTON_ENG_CLOCKWISE,
+	BUTTON_22,
+	BUTTON_23,
+	BUTTON_GRIP,
+	BUTTON_ENG,
+	BUTTON_COUNT
+} ButtonIndex;
 
-typedef struct _HID_T818_Info{
+typedef struct _HID_T818_Info {
 
 	uint16_t wheel_rotation; //X axis
 	uint16_t brake:10; // Y axis
@@ -49,37 +77,10 @@ typedef struct _HID_T818_Info{
 	uint8_t ry_axis;
 	uint8_t z_axis; // not mapped
 
-	uint8_t paddle_shifter_left:1;
-	uint8_t paddle_shifter_right:1;
-	uint8_t drink:1;
-	uint8_t radio:1;
-	uint8_t one_plus:1;
-	uint8_t ten_minus:1;
-	uint8_t sha:1;
-	uint8_t oil:1;
-
-	uint8_t parking:1;
-	uint8_t neutral:1;
-	uint8_t k1:1;
-	uint8_t k2:1;
-	uint8_t s1:1;
-	uint8_t left_side_wheel_up:1;
-	uint8_t left_side_wheel_down:1;
-	uint8_t right_side_wheel_up:1;
-
-	uint8_t right_side_wheel_down:1;
-	uint8_t grip_anticlockwise:1;
-	uint8_t grip_clockwise:1;
-	uint8_t eng_anticlockwise:1;
-	uint8_t eng_clockwise:1;
-	uint8_t button_22:1;
-	uint8_t button_23:1;
-	uint8_t grip:1;
-
-	uint8_t eng:1;
+	uint8_t buttons[BUTTON_COUNT];
 
 	uint8_t pad_arrow:4;
-}HID_T818_Info_TypeDef;
+} HID_T818_Info_TypeDef;
 
 /**
   * @}

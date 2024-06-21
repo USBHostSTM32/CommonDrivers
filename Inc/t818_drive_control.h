@@ -53,34 +53,7 @@ typedef struct {
 	float throttling_module;
 	float clutching_module;
 
-	button_t paddle_shifter_left;
-	button_t paddle_shifter_right;
-	button_t drink;
-	button_t radio;
-	button_t one_plus;
-	button_t ten_minus;
-	button_t sha;
-	button_t oil;
-
-	button_t parking;
-	button_t neutral;
-	button_t k1;
-	button_t k2;
-	button_t s1;
-	button_t left_side_wheel_up;
-	button_t left_side_wheel_down;
-	button_t right_side_wheel_up;
-
-	button_t right_side_wheel_down;
-	button_t grip_anticlockwise;
-	button_t grip_clockwise;
-	button_t eng_anticlockwise;
-	button_t eng_clockwise;
-	button_t button_22;
-	button_t button_23;
-	button_t grip;
-
-	button_t eng;
+	button_t buttons[BUTTON_COUNT];
 
 	DirectionalPadArrowPosition pad_arrow_position;
 
@@ -117,10 +90,6 @@ typedef struct {
 #define T818_DC_ERROR                         ((T818DriveControl_StatusTypeDef) 1U)
 
 /* Function Prototypes ------------------------------------------------------*/
-/*
- *
- */
-
 T818DriveControl_StatusTypeDef t818_drive_control_init(
 		t818_drive_control_t *t818_drive_control,
 		const t818_drive_control_config_t *t818_config,

@@ -4,24 +4,24 @@
 
 static USBH_StatusTypeDef USBH_HID_T818Decode(USBH_HandleTypeDef *phost);
 
-static HID_T818_Info_TypeDef    t818_info;
+static HID_T818_Info_TypeDef t818_info;
 
-uint8_t                  t818_report_data[T818_REPORT_SIZE];
-uint8_t                  t818_rx_report_buf[T818_REPORT_SIZE];
+uint8_t t818_report_data[T818_REPORT_SIZE];
+uint8_t t818_rx_report_buf[T818_REPORT_SIZE];
 
 /* Structures defining how to access items in a HID T818 report */
 
 /* Access x coordinate change. */
 static const HID_Report_ItemTypedef x_axis_state =
 {
-  t818_report_data+1, /*data*/
+  t818_report_data + 1, /*data*/
   16,     /*size*/
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
   0,     /*min value read can return*/
   0xFFFF,  /*max value read can return*/
-  0,     /*min vale device can report*/
+  0,     /*min value device can report*/
   0xFFFF,  /*max value device can report*/
   1      /*resolution*/
 };
@@ -36,11 +36,10 @@ static const HID_Report_ItemTypedef y_axis_state =
   0,     /*signed?*/
   0,     /*min value read can return*/
   1023,  /*max value read can return*/
-  0,     /*min vale device can report*/
+  0,     /*min value device can report*/
   1023,  /*max value device can report*/
   1      /*resolution*/
 };
-
 
 /* Access rz coordinate change. */
 static const HID_Report_ItemTypedef rz_axis_state =
@@ -52,11 +51,10 @@ static const HID_Report_ItemTypedef rz_axis_state =
   0,     /*signed?*/
   0,     /*min value read can return*/
   1023,  /*max value read can return*/
-  0,     /*min vale device can report*/
+  0,     /*min value device can report*/
   1023,  /*max value device can report*/
   1      /*resolution*/
 };
-
 
 /* Access slider coordinate change. */
 static const HID_Report_ItemTypedef slider_axis_state =
@@ -68,7 +66,7 @@ static const HID_Report_ItemTypedef slider_axis_state =
   0,     /*signed?*/
   0,     /*min value read can return*/
   1023,  /*max value read can return*/
-  0,     /*min vale device can report*/
+  0,     /*min value device can report*/
   1023,  /*max value device can report*/
   1      /*resolution*/
 };
@@ -148,382 +146,6 @@ static const HID_Report_ItemTypedef z_axis_state =
   1      /*resolution*/
 };
 
-/* Access button paddle shifter left state. */
-static const HID_Report_ItemTypedef paddle_shifter_left_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  0,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,  /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-
-/* Access button paddle shifter left state. */
-static const HID_Report_ItemTypedef paddle_shifter_right_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  1,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button drink state. */
-static const HID_Report_ItemTypedef drink_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  2,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button radio state. */
-static const HID_Report_ItemTypedef radio_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  3,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button 1 plus state. */
-static const HID_Report_ItemTypedef one_plus_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  4,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button 10 minus state. */
-static const HID_Report_ItemTypedef ten_minus_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  5,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button sha state. */
-static const HID_Report_ItemTypedef sha_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  6,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button oil state. */
-static const HID_Report_ItemTypedef oil_state =
-{
-  t818_report_data + 15, /*data*/
-  1,     /*size*/
-  7,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button parking state. */
-static const HID_Report_ItemTypedef parking_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  0,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button neutral state. */
-static const HID_Report_ItemTypedef neutral_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  1,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button K1 state. */
-static const HID_Report_ItemTypedef k1_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  2,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button K2 state. */
-static const HID_Report_ItemTypedef k2_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  3,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button S1 state. */
-static const HID_Report_ItemTypedef s1_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  4,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button left side wheel up state. */
-static const HID_Report_ItemTypedef left_side_wheel_up_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  5,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button left side wheel down state. */
-static const HID_Report_ItemTypedef left_side_wheel_down_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  6,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button right side wheel down state. */
-static const HID_Report_ItemTypedef right_side_wheel_down_state =
-{
-  t818_report_data + 16, /*data*/
-  1,     /*size*/
-  7,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button right side wheel up state. */
-static const HID_Report_ItemTypedef right_side_wheel_up_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  0,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button grip anticlockwise state. */
-static const HID_Report_ItemTypedef grip_anticlockwise_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  1,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button grip clockwise state. */
-static const HID_Report_ItemTypedef grip_clockwise_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  2,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button eng anticlockwise state. */
-static const HID_Report_ItemTypedef eng_anticlockwise_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  3,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button eng clockwise state. */
-static const HID_Report_ItemTypedef eng_clockwise_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  4,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button button 22 state. */
-static const HID_Report_ItemTypedef button_22_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  5,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button button 23 state. */
-static const HID_Report_ItemTypedef button_23_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  6,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button grip state. */
-static const HID_Report_ItemTypedef grip_state =
-{
-  t818_report_data + 17, /*data*/
-  1,     /*size*/
-  7,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
-/* Access button eng state. */
-static const HID_Report_ItemTypedef eng_state =
-{
-  t818_report_data + 18, /*data*/
-  1,     /*size*/
-  0,     /*shift*/
-  0,     /*count (only for array items)*/
-  0,     /*signed?*/
-  0,     /*min value read can return*/
-  1,     /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
-  1      /*resolution*/
-};
-
 /* Access arrow pad state. */
 static const HID_Report_ItemTypedef pad_arrow_state =
 {
@@ -539,10 +161,43 @@ static const HID_Report_ItemTypedef pad_arrow_state =
   1      /*resolution*/
 };
 
+/* Define button states mapping */
+typedef struct {
+	ButtonIndex index;
+	HID_Report_ItemTypedef report_item;
+} ButtonReportConfig;
+
+static const ButtonReportConfig button_report_configs[BUTTON_COUNT] = {
+	{BUTTON_PADDLE_SHIFTER_LEFT, {t818_report_data + 15, 1, 0, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_PADDLE_SHIFTER_RIGHT, {t818_report_data + 15, 1, 1, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_DRINK, {t818_report_data + 15, 1, 2, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_RADIO, {t818_report_data + 15, 1, 3, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_ONE_PLUS, {t818_report_data + 15, 1, 4, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_TEN_MINUS, {t818_report_data + 15, 1, 5, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_SHA, {t818_report_data + 15, 1, 6, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_OIL, {t818_report_data + 15, 1, 7, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_PARKING, {t818_report_data + 16, 1, 0, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_NEUTRAL, {t818_report_data + 16, 1, 1, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_K1, {t818_report_data + 16, 1, 2, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_K2, {t818_report_data + 16, 1, 3, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_S1, {t818_report_data + 16, 1, 4, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_LEFT_SIDE_WHEEL_UP, {t818_report_data + 16, 1, 5, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_LEFT_SIDE_WHEEL_DOWN, {t818_report_data + 16, 1, 6, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_RIGHT_SIDE_WHEEL_UP, {t818_report_data + 17, 1, 0, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_RIGHT_SIDE_WHEEL_DOWN, {t818_report_data + 16, 1, 7, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_GRIP_ANTICLOCKWISE, {t818_report_data + 17, 1, 1, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_GRIP_CLOCKWISE, {t818_report_data + 17, 1, 2, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_ENG_ANTICLOCKWISE, {t818_report_data + 17, 1, 3, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_ENG_CLOCKWISE, {t818_report_data + 17, 1, 4, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_22, {t818_report_data + 17, 1, 5, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_23, {t818_report_data + 17, 1, 6, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_GRIP, {t818_report_data + 17, 1, 7, 0, 0, 0, 1, 0, 1, 1}},
+	{BUTTON_ENG, {t818_report_data + 18, 1, 0, 0, 0, 0, 1, 0, 1, 1}}
+};
+
 /**
   * @}
   */
-
 
 /** @defgroup USBH_HID_T818_Private_Functions
   * @{
@@ -604,8 +259,6 @@ HID_T818_Info_TypeDef* USBH_HID_T818GetInstance()
 	return &t818_info;
 }
 
-
-
 /**
   * @brief  USBH_HID_T818Decode
   *         The function decode T818 data.
@@ -636,34 +289,10 @@ static USBH_StatusTypeDef USBH_HID_T818Decode(USBH_HandleTypeDef *phost)
     t818_info.ry_axis = (uint16_t)HID_ReadItem((HID_Report_ItemTypedef *) &ry_axis_state, 0U);
     t818_info.z_axis = (uint16_t)HID_ReadItem((HID_Report_ItemTypedef *) &z_axis_state, 0U);
 
-    t818_info.paddle_shifter_left = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &paddle_shifter_left_state, 0U);
-    t818_info.paddle_shifter_right = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &paddle_shifter_right_state, 0U);
-    t818_info.drink = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &drink_state, 0U);
-    t818_info.radio = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &radio_state, 0U);
-    t818_info.one_plus = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &one_plus_state, 0U);
-    t818_info.ten_minus = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &ten_minus_state, 0U);
-    t818_info.sha = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &sha_state, 0U);
-    t818_info.oil = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &oil_state, 0U);
-
-    t818_info.parking = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &parking_state, 0U);
-    t818_info.neutral = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &neutral_state, 0U);
-    t818_info.k1 = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &k1_state, 0U);
-    t818_info.k2 = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &k2_state, 0U);
-    t818_info.s1 = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &s1_state, 0U);
-    t818_info.left_side_wheel_up = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &left_side_wheel_up_state, 0U);
-    t818_info.left_side_wheel_down = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &left_side_wheel_down_state, 0U);
-    t818_info.right_side_wheel_up = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &right_side_wheel_up_state, 0U);
-
-    t818_info.right_side_wheel_down = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &right_side_wheel_down_state, 0U);
-    t818_info.grip_anticlockwise = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &grip_anticlockwise_state, 0U);
-    t818_info.grip_clockwise = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &grip_clockwise_state, 0U);
-    t818_info.eng_anticlockwise = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &eng_anticlockwise_state, 0U);
-    t818_info.eng_clockwise = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &eng_clockwise_state, 0U);
-    t818_info.button_22 = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &button_22_state, 0U);
-    t818_info.button_23 = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &button_23_state, 0U);
-    t818_info.grip = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &grip_state, 0U);
-
-    t818_info.eng = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &eng_state, 0U);
+    for (int i = 0; i < BUTTON_COUNT; i++) {
+    	HID_Report_ItemTypedef * report_item = (HID_Report_ItemTypedef *) &button_report_configs[i].report_item;
+    	t818_info.buttons[button_report_configs[i].index] = (uint8_t)HID_ReadItem(report_item, 0U);
+    }
 
     t818_info.pad_arrow = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &pad_arrow_state, 0U);
 
@@ -672,8 +301,5 @@ static USBH_StatusTypeDef USBH_HID_T818Decode(USBH_HandleTypeDef *phost)
 
   return USBH_FAIL;
 }
-
-
-
 
 /************************ END OF FILE****/
