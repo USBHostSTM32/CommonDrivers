@@ -86,8 +86,14 @@ static inline float __convert_steering_angle(t818_drive_control_t *t818_drive_co
 	return (60.0f/65535.0f)*((float)t818_drive_control->t818_info->wheel_rotation)-30.0f;
 }
 
-static inline float __normalize_value(uint16_t value){
-	return (1.0f/1023.0f)*((float)value);
+static inline float __normalize_value(uint16_t value, uint16_t max_value){
+	const float f_max_value = (float) max_value;
+	float f_value = (float)value;
+
+	if(f_value > f_max_value){
+		value = f_max_value;
+	}
+	return f_value/f_max_value;
 }
 
 T818DriveControl_StatusTypeDef t818_drive_control_update(t818_drive_control_t *t818_drive_control)
@@ -97,9 +103,9 @@ T818DriveControl_StatusTypeDef t818_drive_control_update(t818_drive_control_t *t
 			if (USBH_HID_GetT818Info(t818_drive_control->config->t818_host_handle) == USBH_OK) {
 
 				t818_drive_control->t818_driving_commands.wheel_steering_degree=__convert_steering_angle(t818_drive_control);
-				t818_drive_control->t818_driving_commands.braking_module=__normalize_value(t818_drive_control->t818_info->brake);
-				t818_drive_control->t818_driving_commands.throttling_module=__normalize_value(t818_drive_control->t818_info->throttle);
-				t818_drive_control->t818_driving_commands.clutching_module=__normalize_value(t818_drive_control->t818_info->clutch);
+				t818_drive_control->t818_driving_commands.braking_module=__normalize_value(t818_drive_control->t818_info->brake,T818_BRAKE_MAX);
+				t818_drive_control->t818_driving_commands.throttling_module=__normalize_value(t818_drive_control->t818_info->throttle, T818_THROTTLE_MAX);
+				t818_drive_control->t818_driving_commands.clutching_module=__normalize_value(t818_drive_control->t818_info->clutch,T818_CLUTCH_MAX);
 
 				Button_StatusTypeDef btn_status = BUTTON_OK;
 				for (uint8_t i = 0; (i < (uint8_t)BUTTON_COUNT) && (btn_status == BUTTON_OK); i++) {
