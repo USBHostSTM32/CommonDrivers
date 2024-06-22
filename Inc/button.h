@@ -48,7 +48,7 @@ typedef uint8_t Button_StatusTypeDef;
  */
 #define BUTTON_NOT_PRESSED						(0U)
 
-#define BUTTON_8BIT_MASK						(0b00000001U)
+#define BUTTON_8BIT_MASK						((uint8_t)0b00000001U)
 
 #define BUTTON_LONG_PRESSING_WAITING_TIME		(1000U)
 
@@ -83,7 +83,7 @@ Button_StatusTypeDef button_update(button_t *button, uint8_t new_raw_state);
 
 inline Button_StatusTypeDef button_get_state(button_t *button, uint8_t *state) {
 	Button_StatusTypeDef status = BUTTON_ERROR;
-	if (button != NULL && state != NULL) {
+	if ((button != NULL) && (state != NULL)) {
 		*state = button->state;
 		status = BUTTON_OK;
 	}

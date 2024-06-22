@@ -22,10 +22,14 @@ Button_StatusTypeDef button_is_pressed_long(button_t *button) {
 		case PRESSING:
 			if (button->actual_raw_state == BUTTON_NOT_PRESSED) {
 				button->long_pressed_state = NOT_PRESSED;
-			} else if (HAL_GetTick()
-					- button->start_pressing_time>=BUTTON_LONG_PRESSING_WAITING_TIME) {
-				button->state = !button->state & BUTTON_8BIT_MASK;
+			} else if ((HAL_GetTick()
+					- button->start_pressing_time)>=BUTTON_LONG_PRESSING_WAITING_TIME) {
+				button->state = ((!button->state) & BUTTON_8BIT_MASK);
 				button->long_pressed_state = STATE_CHANGED;
+			}
+			else
+			{
+				button->long_pressed_state = PRESSING;
 			}
 			status = BUTTON_OK;
 			break;
@@ -47,9 +51,9 @@ Button_StatusTypeDef button_is_pressed_level(button_t *button) {
 	Button_StatusTypeDef status = BUTTON_ERROR;
 
 	if (button != NULL) {
-		if (button->actual_raw_state == BUTTON_PRESSED
-				&& button->previous_raw_state == BUTTON_NOT_PRESSED) {
-			button->state = !button->state & BUTTON_8BIT_MASK;
+		if ((button->actual_raw_state == BUTTON_PRESSED)
+				&& (button->previous_raw_state == BUTTON_NOT_PRESSED)) {
+			button->state = ((!button->state) & BUTTON_8BIT_MASK);
 		}
 		status = BUTTON_OK;
 	}
@@ -61,8 +65,8 @@ Button_StatusTypeDef button_is_pressed_edge(button_t *button) {
 	Button_StatusTypeDef status = BUTTON_ERROR;
 
 	if (button != NULL) {
-		if (button->actual_raw_state == BUTTON_PRESSED
-				&& button->previous_raw_state == BUTTON_NOT_PRESSED) {
+		if ((button->actual_raw_state == BUTTON_PRESSED)
+				&& (button->previous_raw_state == BUTTON_NOT_PRESSED)) {
 			button->state = BUTTON_PRESSED;
 		} else {
 			button->state = BUTTON_NOT_PRESSED;
@@ -86,7 +90,7 @@ Button_StatusTypeDef button_is_pressed_base(button_t *button) {
 
 Button_StatusTypeDef button_init(button_t *button, is_pressed_func function) {
 	Button_StatusTypeDef status = BUTTON_ERROR;
-	if (button != NULL && function != NULL) {
+	if ((button != NULL) && (function != NULL)) {
 		button->is_pressed = function;
 		button->actual_raw_state = BUTTON_NOT_PRESSED;
 		button->previous_raw_state = BUTTON_NOT_PRESSED;

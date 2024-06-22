@@ -36,15 +36,15 @@ typedef struct {
 } t818_drive_control_config_t;
 
 typedef enum {
-	DIRECTION_NONE,
-	DIRECTION_UP,
-	DIRECTION_DOWN,
-	DIRECTION_LEFT,
-	DIRECTION_RIGHT,
-	DIRECTION_UP_LEFT,
-	DIRECTION_UP_RIGHT,
-	DIRECTION_DOWN_LEFT,
-	DIRECTION_DOWN_RIGHT
+	DIRECTION_NONE=15,
+	DIRECTION_UP=0,
+	DIRECTION_DOWN=4,
+	DIRECTION_LEFT=6,
+	DIRECTION_RIGHT=2,
+	DIRECTION_UP_LEFT=7,
+	DIRECTION_UP_RIGHT=1,
+	DIRECTION_DOWN_LEFT=5,
+	DIRECTION_DOWN_RIGHT=3
 } DirectionalPadArrowPosition;
 
 typedef struct {
@@ -102,7 +102,7 @@ inline T818DriveControl_StatusTypeDef t818_drive_control_get_driving_commands(
 		t818_drive_control_t *t818_drive_control,
 		t818_driving_commands_t *t818_driving_commands) {
 	T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
-	if (t818_drive_control != NULL && t818_driving_commands != NULL) {
+	if ((t818_drive_control != NULL) && (t818_driving_commands != NULL)) {
 		*t818_driving_commands = t818_drive_control->t818_driving_commands;
 		status = T818_DC_OK;
 	}

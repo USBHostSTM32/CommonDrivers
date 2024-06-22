@@ -214,6 +214,8 @@ USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost)
   uint32_t i;
   HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *) phost->pActiveClass->pData;
 
+  USBH_StatusTypeDef status=USBH_FAIL;
+
   memset(&t818_info, 0, sizeof(HID_T818_Info_TypeDef));
 
   for (i = 0U; i < (sizeof(t818_report_data)); i++)
@@ -230,13 +232,14 @@ USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost)
   HID_Handle->pData = t818_rx_report_buf;
   if ((HID_QUEUE_SIZE * sizeof(t818_report_data)) > sizeof(phost->device.Data))
   {
-	  return USBH_FAIL;
+	  status=USBH_FAIL;
   }
   else
   {
 	  USBH_HID_FifoInit(&HID_Handle->fifo, phost->device.Data, HID_QUEUE_SIZE * sizeof(t818_report_data));
+	  status=USBH_OK;
   }
-  return USBH_OK;
+  return status;
 }
 
 //ADD DOXYGEN
@@ -269,13 +272,10 @@ static USBH_StatusTypeDef USBH_HID_T818Decode(USBH_HandleTypeDef *phost)
 {
   HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *) phost->pActiveClass->pData;
 
-  if (HID_Handle->length == 0U || (HID_Handle->fifo.buf == NULL))
-  {
-    return USBH_FAIL;
-  }
+  USBH_StatusTypeDef status=USBH_FAIL;
 
   /*Fill report */
-  if (USBH_HID_FifoRead(&HID_Handle->fifo, &t818_report_data, HID_Handle->length) ==  HID_Handle->length)
+  if ((!(HID_Handle->length == 0U) || (HID_Handle->fifo.buf == NULL)) && (USBH_HID_FifoRead(&HID_Handle->fifo, &t818_report_data, HID_Handle->length) ==  HID_Handle->length))
   {
 
     /*Decode report */
@@ -289,17 +289,17 @@ static USBH_StatusTypeDef USBH_HID_T818Decode(USBH_HandleTypeDef *phost)
     t818_info.ry_axis = (uint16_t)HID_ReadItem((HID_Report_ItemTypedef *) &ry_axis_state, 0U);
     t818_info.z_axis = (uint16_t)HID_ReadItem((HID_Report_ItemTypedef *) &z_axis_state, 0U);
 
-    for (int i = 0; i < BUTTON_COUNT; i++) {
+    for (uint8_t i = 0; i < BUTTON_COUNT; i++) {
     	HID_Report_ItemTypedef * report_item = (HID_Report_ItemTypedef *) &button_report_configs[i].report_item;
     	t818_info.buttons[button_report_configs[i].index] = (uint8_t)HID_ReadItem(report_item, 0U);
     }
 
     t818_info.pad_arrow = (uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &pad_arrow_state, 0U);
 
-    return USBH_OK;
+    status= USBH_OK;
   }
 
-  return USBH_FAIL;
+  return status;
 }
 
 /************************ END OF FILE****/

@@ -36,6 +36,8 @@ extern "C" {
 #define T818_ID_PRODUCT					(46742U)
 #define T818_REPORT_SIZE				(64)
 
+#define BUTTON_COUNT					((uint8_t)25U)
+
 typedef enum {
 	BUTTON_PADDLE_SHIFTER_LEFT,
 	BUTTON_PADDLE_SHIFTER_RIGHT,
@@ -62,7 +64,6 @@ typedef enum {
 	BUTTON_23,
 	BUTTON_GRIP,
 	BUTTON_ENG,
-	BUTTON_COUNT
 } ButtonIndex;
 
 typedef struct _HID_T818_Info {
@@ -115,7 +116,7 @@ extern USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost);
 //ADD DOXYGEN
 USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost);
 //ADD DOXYGEN
-HID_T818_Info_TypeDef* USBH_HID_T818GetInstance();
+HID_T818_Info_TypeDef* USBH_HID_T818GetInstance(void);
 /**
   * @}
   */
