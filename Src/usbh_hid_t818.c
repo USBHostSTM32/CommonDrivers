@@ -163,7 +163,7 @@ static const HID_Report_ItemTypedef pad_arrow_state =
 
 /* Define button states mapping */
 typedef struct {
-	ButtonIndex index;
+	uint8_t index;
 	HID_Report_ItemTypedef report_item;
 } ButtonReportConfig;
 

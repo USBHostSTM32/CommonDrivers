@@ -3,7 +3,7 @@
 typedef Button_StatusTypeDef (*button_init_func_t)(button_t *);
 
 typedef struct {
-	ButtonIndex index;
+	uint8_t index;
 	button_init_func_t init_func;
 } ButtonInitConfig;
 
@@ -45,8 +45,8 @@ static T818DriveControl_StatusTypeDef t818_driving_commands_init(t818_driving_co
 		t818_driving_commands->clutching_module = 0.0f;
 
 		Button_StatusTypeDef btn_status = BUTTON_OK;
-		for (uint8_t i = 0; (i < (uint8_t)BUTTON_COUNT) && (btn_status == BUTTON_OK); i++) {
-			ButtonIndex index = button_init_configs[i].index;
+		for (uint8_t i = 0; (i < BUTTON_COUNT) && (btn_status == BUTTON_OK); i++) {
+			uint8_t index = button_init_configs[i].index;
 			button_init_func_t init_func = button_init_configs[i].init_func;
 			btn_status = button_init(&t818_driving_commands->buttons[index], init_func);
 		}

@@ -17,6 +17,7 @@
  */
 #include "stdint.h"
 #include "stdio.h"
+#include "stm32f7xx_hal.h"
 
 typedef uint8_t Button_StatusTypeDef;
 
