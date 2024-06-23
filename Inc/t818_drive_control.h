@@ -32,7 +32,6 @@ typedef uint8_t T818DriveControl_StatusTypeDef;
  */
 typedef struct {
     USBH_HandleTypeDef *t818_host_handle; /**< Pointer to the USB host handle */
-    USBH_HID_StateTypeDef *t818_hid_state; /**< Pointer to the HID state structure */
 } t818_drive_control_config_t;
 
 /**
