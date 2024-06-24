@@ -14,9 +14,14 @@
 
 /* Initialization of vcu_pix_state */
 static vcu_pix_state_t vcu_pix_state = {
-    .t818_control = NULL  						/**< t818 control pointer initialized to NULL */
+    .t818_driving_commands = {
+        .wheel_steering_degree = 0.0f,
+        .braking_module = 0.0f,
+        .throttling_module = 0.0f,
+        .clutching_module = 0.0f,
+        .pad_arrow_position = DIRECTION_NONE
+    }
 };
-
 /* Constant pointer to the vcu_pix_state_t instance */
 static vcu_pix_state_t * const instance = &vcu_pix_state;
 

@@ -32,7 +32,7 @@ typedef uint8_t VCUPix_StatusTypeDef;
  * information about the current HID report from the T818 device.
  */
 typedef struct {
-	t818_drive_control_t *t818_control;
+	t818_driving_commands_t t818_driving_commands;
 } vcu_pix_state_t;
 
 
