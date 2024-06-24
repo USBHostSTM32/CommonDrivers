@@ -29,15 +29,15 @@ extern "C" {
   * @{
   */
 
-#define T818_ID_VENDOR					(1103U)
-#define T818_ID_PRODUCT					(46742U)
-#define T818_REPORT_SIZE				(64U)
+#define T818_ID_VENDOR					        (1103U)
+#define T818_ID_PRODUCT					        (46742U)
+#define T818_REPORT_SIZE				        (64U)
 
-#define T818_ID_VENDOR               	(1103U)
-#define T818_ID_PRODUCT              	(46742U)
-#define T818_REPORT_SIZE             	(64U)
+#define T818_ID_VENDOR               	  (1103U)
+#define T818_ID_PRODUCT              	  (46742U)
+#define T818_REPORT_SIZE             	  (64U)
 
-#define BUTTON_COUNT                 	((uint8_t)25U)
+#define BUTTON_COUNT                 	  ((uint8_t)25U)
 
 #define BUTTON_PADDLE_SHIFTER_LEFT    	((uint8_t)0U)
 #define BUTTON_PADDLE_SHIFTER_RIGHT   	((uint8_t)1U)
