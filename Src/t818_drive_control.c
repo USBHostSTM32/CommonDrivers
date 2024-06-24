@@ -219,7 +219,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 			status = T818_DC_OK;
 			break;
 		case READING_WHEEL:
-			if (__check_wheel_is_linked(t818_drive_control) == T818_WHEEL_LINKED) {
+			if (__check_wheel_is_linked(t818_drive_control) == CD_TRUE) {
 				status = __t818_drive_control_update(t818_drive_control);
 			} else {
 				t818_drive_control->state = WAITING_WHEEL_COFIGURATION;

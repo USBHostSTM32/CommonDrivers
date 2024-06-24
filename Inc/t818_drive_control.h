@@ -104,14 +104,6 @@ typedef uint8_t bool;
 #define CD_FALSE						((bool) 0U)
 
 
-#define T818_WHEEL_READY				(1U)
-
-#define T818_WHEEL_NOT_READY			(0U)
-
-#define T818_WHEEL_LINKED				(1U)
-
-#define T818_WHEEL_NOT_LINKED			(0U)
-
 #define T818_PEDAL_INCREMENT			(0.01f)
 
 #define T818_PEDAL_DECREMENT			(0.01f)
