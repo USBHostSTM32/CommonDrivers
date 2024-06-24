@@ -15,6 +15,7 @@
 
 #include <usbh_hid_t818.h>
 #include "button.h"
+#include "math.h"
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
@@ -51,6 +52,11 @@ typedef enum {
     DIRECTION_DOWN_RIGHT = 3
 } DirectionalPadArrowPosition;
 
+typedef enum {
+   WAITING_WHEEL_COFIGURATION,
+   READING_WHEEL
+} t818_drive_control_state;
+
 /**
  * @brief T818 Driving Commands Structure
  *
@@ -77,18 +83,43 @@ typedef struct {
     HID_T818_Info_TypeDef *t818_info; /**< Pointer to the T818 info structure */
     const t818_drive_control_config_t *config; /**< Pointer to the configuration structure */
     t818_driving_commands_t t818_driving_commands; /**< Current driving commands */
+    t818_drive_control_state state;
 } t818_drive_control_t;
 
 /* Defines ------------------------------------------------------------------*/
 /**
  * @brief Macro indicating successful operation.
  */
-#define T818_DC_OK         ((T818DriveControl_StatusTypeDef) 0U)
+#define T818_DC_OK        		 	((T818DriveControl_StatusTypeDef) 0U)
 
 /**
  * @brief Macro indicating an error occurred.
  */
-#define T818_DC_ERROR      ((T818DriveControl_StatusTypeDef) 1U)
+#define T818_DC_ERROR      			((T818DriveControl_StatusTypeDef) 1U)
+
+#define T818_WHEEL_READY			(1U)
+
+#define T818_WHEEL_NOT_READY		(0U)
+
+#define T818_WHEEL_LINKED			(1U)
+
+#define T818_WHEEL_NOT_LINKED		(0U)
+
+#define T818_PEDAL_MAX_VALUE		(1023U)
+
+#define T818_PEDAL_INCREMENT		(0.01f)
+
+#define T818_PEDAL_DECREMENT		(0.01f)
+
+#define T818_BRAKING_SET_POINT		(1.0f)
+
+#define T818_THROTTLING_SET_POINT	(0.0f)
+
+#define T818_BRAKE_MAX				(1023U)
+
+#define T818_THROTTLE_MAX			(1023U)
+
+#define T818_CLUTCH_MAX				(1023U)
 
 /* Function Prototypes ------------------------------------------------------*/
 /**
@@ -104,13 +135,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_init(
     const t818_drive_control_config_t *t818_config,
     HID_T818_Info_TypeDef *t818_info);
 
-/**
- * @brief Updates the T818 Drive Control module with the latest HID information.
- *
- * @param t818_drive_control Pointer to the T818 Drive Control state structure.
- * @return T818DriveControl_StatusTypeDef Status of the update process.
- */
-T818DriveControl_StatusTypeDef t818_drive_control_update(
+T818DriveControl_StatusTypeDef t818_drive_control_step(
     t818_drive_control_t *t818_drive_control);
 
 /**
