@@ -1,10 +1,13 @@
-/*
- * button_manager.c
+/**
+ * @file button.c
+ * @brief Source file for Button Manager module.
  *
- *  Created on: Jun 21, 2024
- *      Author: vital
+ * This file contains the implementations of functions for
+ * the Button Manager module, which handles button states and interactions.
+ *
+ * Created on: Jun 21, 2024
+ * Authors: Alessio Guarini, Antonio Vitale
  */
-
 #include "button.h"
 
 Button_StatusTypeDef button_is_pressed_long(button_t *button) {

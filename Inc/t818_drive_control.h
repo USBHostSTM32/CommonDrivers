@@ -90,36 +90,36 @@ typedef struct {
 /**
  * @brief Macro indicating successful operation.
  */
-#define T818_DC_OK        		 	((T818DriveControl_StatusTypeDef) 0U)
+#define T818_DC_OK         			((T818DriveControl_StatusTypeDef) 0U)
 
 /**
  * @brief Macro indicating an error occurred.
  */
-#define T818_DC_ERROR      			((T818DriveControl_StatusTypeDef) 1U)
+#define T818_DC_ERROR     			 ((T818DriveControl_StatusTypeDef) 1U)
 
-#define T818_WHEEL_READY			(1U)
 
-#define T818_WHEEL_NOT_READY		(0U)
+typedef uint8_t bool;
 
-#define T818_WHEEL_LINKED			(1U)
+#define CD_TRUE							((bool) 1U)
+#define CD_FALSE						((bool) 0U)
 
-#define T818_WHEEL_NOT_LINKED		(0U)
 
-#define T818_PEDAL_MAX_VALUE		(1023U)
+#define T818_WHEEL_READY				(1U)
 
-#define T818_PEDAL_INCREMENT		(0.01f)
+#define T818_WHEEL_NOT_READY			(0U)
 
-#define T818_PEDAL_DECREMENT		(0.01f)
+#define T818_WHEEL_LINKED				(1U)
 
-#define T818_BRAKING_SET_POINT		(1.0f)
+#define T818_WHEEL_NOT_LINKED			(0U)
 
-#define T818_THROTTLING_SET_POINT	(0.0f)
+#define T818_PEDAL_INCREMENT			(0.01f)
 
-#define T818_BRAKE_MAX				(1023U)
+#define T818_PEDAL_DECREMENT			(0.01f)
 
-#define T818_THROTTLE_MAX			(1023U)
+#define T818_BRAKING_SET_POINT			(1.0f)
 
-#define T818_CLUTCH_MAX				(1023U)
+#define T818_THROTTLING_SET_POINT		(0.0f)
+
 
 /* Function Prototypes ------------------------------------------------------*/
 /**
