@@ -19,10 +19,10 @@ static const HID_Report_ItemTypedef x_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0xFFFF,  /*max value read can return*/
-  0,     /*min value device can report*/
-  0xFFFF,  /*max value device can report*/
+  T818_WHEEL_ROTATION_MIN,     /*min value read can return*/
+  T818_WHEEL_ROTATION_MAX,     /*max value read can return*/
+  T818_WHEEL_ROTATION_MIN,     /*min value device can report*/
+  T818_WHEEL_ROTATION_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -34,10 +34,10 @@ static const HID_Report_ItemTypedef y_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  1023,  /*max value read can return*/
-  0,     /*min value device can report*/
-  1023,  /*max value device can report*/
+  T818_BRAKE_MIN,     /*min value read can return*/
+  T818_BRAKE_MAX,     /*max value read can return*/
+  T818_BRAKE_MIN,     /*min value device can report*/
+  T818_BRAKE_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -49,10 +49,10 @@ static const HID_Report_ItemTypedef rz_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  1023,  /*max value read can return*/
-  0,     /*min value device can report*/
-  1023,  /*max value device can report*/
+  T818_THROTTLE_MIN,     /*min value read can return*/
+  T818_THROTTLE_MAX,     /*max value read can return*/
+  T818_THROTTLE_MIN,     /*min value device can report*/
+  T818_THROTTLE_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -64,10 +64,10 @@ static const HID_Report_ItemTypedef slider_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  1023,  /*max value read can return*/
-  0,     /*min value device can report*/
-  1023,  /*max value device can report*/
+  T818_CLUTCH_MIN,     /*min value read can return*/
+  T818_CLUTCH_MAX,     /*max value read can return*/
+  T818_CLUTCH_MIN,     /*min value device can report*/
+  T818_CLUTCH_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -79,10 +79,10 @@ static const HID_Report_ItemTypedef vx_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0xFF,  /*max value read can return*/
-  0,     /*min value device can report*/
-  0xFF,     /*max value device can report*/
+  T818_VX_AXIS_MIN,     /*min value read can return*/
+  T818_VX_AXIS_MAX,     /*max value read can return*/
+  T818_VX_AXIS_MIN,     /*min value device can report*/
+  T818_VX_AXIS_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -94,10 +94,10 @@ static const HID_Report_ItemTypedef vy_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0xFF,  /*max value read can return*/
-  0,     /*min value device can report*/
-  0xFF,     /*max value device can report*/
+  T818_VY_AXIS_MIN,     /*min value read can return*/
+  T818_VY_AXIS_MAX,     /*max value read can return*/
+  T818_VY_AXIS_MIN,     /*min value device can report*/
+  T818_VY_AXIS_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -109,10 +109,10 @@ static const HID_Report_ItemTypedef rx_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0xFF,  /*max value read can return*/
-  0,     /*min value device can report*/
-  0xFF,     /*max value device can report*/
+  T818_RX_AXIS_MIN,     /*min value read can return*/
+  T818_RX_AXIS_MAX,     /*max value read can return*/
+  T818_RX_AXIS_MIN,     /*min value device can report*/
+  T818_RX_AXIS_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -124,10 +124,10 @@ static const HID_Report_ItemTypedef ry_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0xFF,  /*max value read can return*/
-  0,     /*min value device can report*/
-  0xFF,     /*max value device can report*/
+  T818_RY_AXIS_MIN,     /*min value read can return*/
+  T818_RY_AXIS_MAX,     /*max value read can return*/
+  T818_RY_AXIS_MIN,     /*min value device can report*/
+  T818_RY_AXIS_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -139,10 +139,10 @@ static const HID_Report_ItemTypedef z_axis_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0xFF,  /*max value read can return*/
-  0,     /*min value device can report*/
-  0xFF,     /*max value device can report*/
+  T818_Z_AXIS_MIN,     /*min value read can return*/
+  T818_Z_AXIS_MAX,     /*max value read can return*/
+  T818_Z_AXIS_MIN,     /*min value device can report*/
+  T818_Z_AXIS_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -154,10 +154,10 @@ static const HID_Report_ItemTypedef pad_arrow_state =
   0,     /*shift*/
   0,     /*count (only for array items)*/
   0,     /*signed?*/
-  0,     /*min value read can return*/
-  0x0F,  /*max value read can return*/
-  0,     /*min value device can report*/
-  1,     /*max value device can report*/
+  T818_PAD_ARROW_MIN,     /*min value read can return*/
+  T818_PAD_ARROW_MAX,     /*max value read can return*/
+  T818_PAD_ARROW_MIN,     /*min value device can report*/
+  T818_PAD_ARROW_MAX,     /*max value device can report*/
   1      /*resolution*/
 };
 
@@ -242,21 +242,7 @@ USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost)
   return status;
 }
 
-
-/**
-  * @brief  Get the instance of T818 HID Information.
-  * @retval Pointer to HID_T818_Info_TypeDef structure
-  */
-HID_T818_Info_TypeDef* USBH_HID_T818GetInstance()
-{
-	return &t818_info;
-}
-
-/**
-  * @brief  Get the T818 HID Information.
-  * @param  phost: Host handle
-  * @retval USBH Status
-  */
+//ADD DOXYGEN
 USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost)
 {
 	USBH_StatusTypeDef status=USBH_FAIL;
@@ -269,6 +255,13 @@ USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost)
   return status;
 
 }
+
+//ADD DOXYGEN
+HID_T818_Info_TypeDef* USBH_HID_T818GetInstance()
+{
+	return &t818_info;
+}
+
 /**
   * @brief  USBH_HID_T818Decode
   *         The function decode T818 data.
