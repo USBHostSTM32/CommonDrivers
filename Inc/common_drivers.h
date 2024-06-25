@@ -14,6 +14,11 @@
 
 #include "stdint.h"
 
+typedef uint8_t bool;
+
+#define CD_TRUE							((bool) 1U)
+#define CD_FALSE						((bool) 0U)
+
 /**
  * Clamps a float value to a specified range.
  *
