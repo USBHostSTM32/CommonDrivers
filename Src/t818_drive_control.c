@@ -8,32 +8,31 @@ typedef struct {
 } ButtonInitConfig;
 
 static const ButtonInitConfig button_init_configs[BUTTON_COUNT] = {
-    { BUTTON_PADDLE_SHIFTER_LEFT, button_is_pressed_edge },//USED
-    { BUTTON_PADDLE_SHIFTER_RIGHT, button_is_pressed_edge },//USED
-    { BUTTON_DRINK, button_is_pressed_base },
-    { BUTTON_RADIO, button_is_pressed_base },
-    { BUTTON_ONE_PLUS, button_is_pressed_long },
-    { BUTTON_TEN_MINUS, button_is_pressed_long },
-    { BUTTON_SHA, button_is_pressed_level },//USED
-    { BUTTON_OIL, button_is_pressed_long },
-    { BUTTON_PARKING, button_is_pressed_edge },//USED
-    { BUTTON_NEUTRAL, button_is_pressed_edge },//USED
-    { BUTTON_K1, button_is_pressed_level },//USED
-    { BUTTON_K2, button_is_pressed_level },//USED
-    { BUTTON_S1, button_is_pressed_edge },
-    { BUTTON_LEFT_SIDE_WHEEL_UP, button_is_pressed_edge },
-    { BUTTON_LEFT_SIDE_WHEEL_DOWN, button_is_pressed_edge },
-    { BUTTON_RIGHT_SIDE_WHEEL_UP, button_is_pressed_edge },
-    { BUTTON_RIGHT_SIDE_WHEEL_DOWN, button_is_pressed_base },
-    { BUTTON_GRIP_ANTICLOCKWISE, button_is_pressed_base },
-    { BUTTON_GRIP_CLOCKWISE, button_is_pressed_long },
-    { BUTTON_ENG_ANTICLOCKWISE, button_is_pressed_long },
-    { BUTTON_ENG_CLOCKWISE, button_is_pressed_level },
-    { BUTTON_22, button_is_pressed_level },
-    { BUTTON_23, button_is_pressed_edge },
-    { BUTTON_GRIP, button_is_pressed_edge },
-    { BUTTON_ENG, button_is_pressed_base }
-};
+		{ BUTTON_PADDLE_SHIFTER_LEFT, button_is_pressed_edge }, //USED
+		{ BUTTON_PADDLE_SHIFTER_RIGHT, button_is_pressed_edge }, //USED
+		{ BUTTON_DRINK, button_is_pressed_base }, { BUTTON_RADIO,
+				button_is_pressed_base }, { BUTTON_ONE_PLUS,
+				button_is_pressed_long }, { BUTTON_TEN_MINUS,
+				button_is_pressed_long },
+		{ BUTTON_SHA, button_is_pressed_level }, //USED
+		{ BUTTON_OIL, button_is_pressed_long },
+		{ BUTTON_PARKING, button_is_pressed_edge }, //USED
+		{ BUTTON_NEUTRAL, button_is_pressed_edge }, //USED
+		{ BUTTON_K1, button_is_pressed_level }, //USED
+		{ BUTTON_K2, button_is_pressed_level }, //USED
+		{ BUTTON_S1, button_is_pressed_edge }, { BUTTON_LEFT_SIDE_WHEEL_UP,
+				button_is_pressed_edge }, { BUTTON_LEFT_SIDE_WHEEL_DOWN,
+				button_is_pressed_edge }, { BUTTON_RIGHT_SIDE_WHEEL_UP,
+				button_is_pressed_edge }, { BUTTON_RIGHT_SIDE_WHEEL_DOWN,
+				button_is_pressed_base }, { BUTTON_GRIP_ANTICLOCKWISE,
+				button_is_pressed_base }, { BUTTON_GRIP_CLOCKWISE,
+				button_is_pressed_long }, { BUTTON_ENG_ANTICLOCKWISE,
+				button_is_pressed_long }, { BUTTON_ENG_CLOCKWISE,
+				button_is_pressed_level },
+		{ BUTTON_22, button_is_pressed_level }, { BUTTON_23,
+				button_is_pressed_edge },
+		{ BUTTON_GRIP, button_is_pressed_edge }, { BUTTON_ENG,
+				button_is_pressed_base } };
 
 static T818DriveControl_StatusTypeDef t818_driving_commands_init(
 		t818_driving_commands_t *t818_driving_commands) {
@@ -107,14 +106,14 @@ static inline T818DriveControl_StatusTypeDef __t818_drive_control_update(
 		t818_drive_control->t818_driving_commands.wheel_steering_degree =
 				__convert_steering_angle(
 						t818_drive_control->t818_info->wheel_rotation);
-		t818_drive_control->t818_driving_commands.braking_module = 1.0f -
-				__normalize_value(~(t818_drive_control->t818_info->brake),
+		t818_drive_control->t818_driving_commands.braking_module =1.0f-
+				__normalize_value((t818_drive_control->t818_info->brake),
 				T818_BRAKE_MAX);
-		t818_drive_control->t818_driving_commands.throttling_module =
-				__normalize_value(~(t818_drive_control->t818_info->throttle),
+		t818_drive_control->t818_driving_commands.throttling_module =1.0f-
+				__normalize_value((t818_drive_control->t818_info->throttle),
 				T818_THROTTLE_MAX);
-		t818_drive_control->t818_driving_commands.clutching_module =
-				__normalize_value(~(t818_drive_control->t818_info->clutch),
+		t818_drive_control->t818_driving_commands.clutching_module =1.0f-
+				__normalize_value((t818_drive_control->t818_info->clutch),
 				T818_CLUTCH_MAX);
 
 		Button_StatusTypeDef btn_status = BUTTON_OK;
@@ -156,8 +155,7 @@ static inline bool __check_wheel_is_ready(
 
 	if (__check_wheel_is_linked(t818_drive_control) == CD_TRUE) {
 		if ((t818_drive_control->t818_info->brake == T818_BRAKE_MAX)
-				&& (t818_drive_control->t818_info->throttle
-						== T818_THROTTLE_MAX)
+				&& (t818_drive_control->t818_info->throttle == T818_THROTTLE_MAX)
 				&& (t818_drive_control->t818_info->clutch == T818_CLUTCH_MAX)) {
 			wheel_ready = CD_TRUE;
 		}

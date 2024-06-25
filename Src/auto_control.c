@@ -126,15 +126,16 @@ inline static void __basic_rules(auto_control_t *auto_control) {
 
 	auto_control->mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
 
-	auto_control->steering = map_valuefloat(
-			auto_control->driving_commands->wheel_steering_degree,
-			T818_MIN_STEERING_ANGLE, T818_MAX_STEERING_ANGLE,
-			AUTO_CONTROL_MIN_STEERING, AUTO_CONTROL_MAX_STEERING);
+	auto_control->steering = (int16_t) roundf(
+			map_value_float(
+					auto_control->driving_commands->wheel_steering_degree,
+					T818_MIN_STEERING_ANGLE, T818_MAX_STEERING_ANGLE,
+					AUTO_CONTROL_MIN_STEERING, AUTO_CONTROL_MAX_STEERING));
 }
 
 inline static void __moving_rules(auto_control_t *auto_control) {
 	uint16_t braking, speed;
-	auto_control->EBP = EC_FALSE;
+	auto_control->EBP = CD_FALSE;
 	braking = (uint16_t) roundf(
 			auto_control->driving_commands->braking_module
 					* AUTO_CONTROL_MAX_BRAKING);
@@ -154,7 +155,7 @@ inline static void __moving_rules(auto_control_t *auto_control) {
 
 inline static void __neutral_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
-	auto_control->EBP = EC_FALSE;
+	auto_control->EBP = CD_FALSE;
 	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
 	auto_control->braking = AUTO_CONTROL_MAX_BRAKING;
 	auto_control->speed = AUTO_CONTROL_MIN_SPEED;
@@ -162,8 +163,8 @@ inline static void __neutral_rules(auto_control_t *auto_control) {
 
 inline static void __parking_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
-	auto_control->EBP = EC_TRUE;
-	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_PARKING;
+	auto_control->EBP = CD_TRUE;
+	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
 	auto_control->braking = AUTO_CONTROL_MAX_BRAKING;
 	auto_control->speed = AUTO_CONTROL_MIN_SPEED;
 }
