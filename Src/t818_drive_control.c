@@ -107,7 +107,7 @@ static inline T818DriveControl_StatusTypeDef __t818_drive_control_update(
 		t818_drive_control->t818_driving_commands.wheel_steering_degree =
 				__convert_steering_angle(
 						t818_drive_control->t818_info->wheel_rotation);
-		t818_drive_control->t818_driving_commands.braking_module = 1.0f -
+		t818_drive_control->t818_driving_commands.braking_module =
 				__normalize_value(~(t818_drive_control->t818_info->brake),
 				T818_BRAKE_MAX);
 		t818_drive_control->t818_driving_commands.throttling_module =
