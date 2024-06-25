@@ -96,7 +96,7 @@ static inline float __normalize_value(uint16_t value, uint16_t max_value) {
 	if (f_value > f_max_value) {
 		f_value = f_max_value;
 	}
-	return 1.0f - f_value / f_max_value;
+	return f_value / f_max_value;
 }
 
 static inline T818DriveControl_StatusTypeDef __t818_drive_control_update(
@@ -107,14 +107,14 @@ static inline T818DriveControl_StatusTypeDef __t818_drive_control_update(
 		t818_drive_control->t818_driving_commands.wheel_steering_degree =
 				__convert_steering_angle(
 						t818_drive_control->t818_info->wheel_rotation);
-		t818_drive_control->t818_driving_commands.braking_module =
-				__normalize_value(t818_drive_control->t818_info->brake,
+		t818_drive_control->t818_driving_commands.braking_module = 1.0f -
+				__normalize_value(~(t818_drive_control->t818_info->brake),
 				T818_BRAKE_MAX);
 		t818_drive_control->t818_driving_commands.throttling_module =
-				__normalize_value(t818_drive_control->t818_info->throttle,
+				__normalize_value(~(t818_drive_control->t818_info->throttle),
 				T818_THROTTLE_MAX);
 		t818_drive_control->t818_driving_commands.clutching_module =
-				__normalize_value(t818_drive_control->t818_info->clutch,
+				__normalize_value(~(t818_drive_control->t818_info->clutch),
 				T818_CLUTCH_MAX);
 
 		Button_StatusTypeDef btn_status = BUTTON_OK;
@@ -219,7 +219,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 			status = T818_DC_OK;
 			break;
 		case READING_WHEEL:
-			if (__check_wheel_is_linked(t818_drive_control) == T818_WHEEL_LINKED) {
+			if (__check_wheel_is_linked(t818_drive_control) == CD_TRUE) {
 				status = __t818_drive_control_update(t818_drive_control);
 			} else {
 				t818_drive_control->state = WAITING_WHEEL_COFIGURATION;
