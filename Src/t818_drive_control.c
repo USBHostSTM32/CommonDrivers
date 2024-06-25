@@ -8,18 +8,18 @@ typedef struct {
 } ButtonInitConfig;
 
 static const ButtonInitConfig button_init_configs[BUTTON_COUNT] = {
-    { BUTTON_PADDLE_SHIFTER_LEFT, button_is_pressed_base },
-    { BUTTON_PADDLE_SHIFTER_RIGHT, button_is_pressed_base },
+    { BUTTON_PADDLE_SHIFTER_LEFT, button_is_pressed_edge },//USED
+    { BUTTON_PADDLE_SHIFTER_RIGHT, button_is_pressed_edge },//USED
     { BUTTON_DRINK, button_is_pressed_base },
     { BUTTON_RADIO, button_is_pressed_base },
     { BUTTON_ONE_PLUS, button_is_pressed_long },
     { BUTTON_TEN_MINUS, button_is_pressed_long },
-    { BUTTON_SHA, button_is_pressed_long },
+    { BUTTON_SHA, button_is_pressed_level },//USED
     { BUTTON_OIL, button_is_pressed_long },
-    { BUTTON_PARKING, button_is_pressed_level },
-    { BUTTON_NEUTRAL, button_is_pressed_level },
-    { BUTTON_K1, button_is_pressed_level },
-    { BUTTON_K2, button_is_pressed_level },
+    { BUTTON_PARKING, button_is_pressed_edge },//USED
+    { BUTTON_NEUTRAL, button_is_pressed_edge },//USED
+    { BUTTON_K1, button_is_pressed_level },//USED
+    { BUTTON_K2, button_is_pressed_level },//USED
     { BUTTON_S1, button_is_pressed_edge },
     { BUTTON_LEFT_SIDE_WHEEL_UP, button_is_pressed_edge },
     { BUTTON_LEFT_SIDE_WHEEL_DOWN, button_is_pressed_edge },

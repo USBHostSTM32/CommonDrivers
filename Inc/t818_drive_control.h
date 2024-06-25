@@ -16,6 +16,7 @@
 #include <usbh_hid_t818.h>
 #include "button.h"
 #include "math.h"
+#include "common_drivers.h"
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
@@ -97,13 +98,6 @@ typedef struct {
  */
 #define T818_DC_ERROR     			 ((T818DriveControl_StatusTypeDef) 1U)
 
-
-typedef uint8_t bool;
-
-#define CD_TRUE							((bool) 1U)
-#define CD_FALSE						((bool) 0U)
-
-
 #define T818_WHEEL_READY				(1U)
 
 #define T818_WHEEL_NOT_READY			(0U)
@@ -119,6 +113,10 @@ typedef uint8_t bool;
 #define T818_BRAKING_SET_POINT			(1.0f)
 
 #define T818_THROTTLING_SET_POINT		(0.0f)
+
+#define T818_MAX_STEERING_ANGLE			(30.0f)
+
+#define T818_MIN_STEERING_ANGLE			(-30.0f)
 
 
 /* Function Prototypes ------------------------------------------------------*/
