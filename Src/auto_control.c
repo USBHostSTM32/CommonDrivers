@@ -13,19 +13,19 @@ AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
 
 	if (auto_control != NULL && driving_commands != NULL) {
 		auto_control->driving_commands = driving_commands;
-		auto_control->self_driving = CD_FALSE;
-		auto_control->advanced_mode = CD_FALSE;
-		auto_control->state_control = CD_FALSE;
-		auto_control->speed_mode = CD_FALSE;
-		auto_control->right_light = CD_FALSE;
-		auto_control->left_light = CD_FALSE;
-		auto_control->front_light = CD_FALSE;
-		auto_control->EBP = CD_TRUE;
-		auto_control->mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
-		auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_PARK;
-		auto_control->steering = 0;
-		auto_control->braking = AUTO_CONTROL_MIN_BRAKING;
-		auto_control->speed = AUTO_CONTROL_MIN_SPEED;
+		auto_control->auto_control_data.self_driving = CD_FALSE;
+		auto_control->auto_control_data.advanced_mode = CD_FALSE;
+		auto_control->auto_control_data.state_control = CD_FALSE;
+		auto_control->auto_control_data.speed_mode = CD_FALSE;
+		auto_control->auto_control_data.right_light = CD_FALSE;
+		auto_control->auto_control_data.left_light = CD_FALSE;
+		auto_control->auto_control_data.front_light = CD_FALSE;
+		auto_control->auto_control_data.EBP = CD_TRUE;
+		auto_control->auto_control_data.mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+		auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_PARK;
+		auto_control->auto_control_data.steering = 0;
+		auto_control->auto_control_data.braking = AUTO_CONTROL_MIN_BRAKING;
+		auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
 		auto_control->state = PARKING;
 
 		status = AUTO_CONTROL_OK;
@@ -88,21 +88,21 @@ static inline auto_control_state __update_auto_control_state_drive(auto_control_
 
 
 inline static void __basic_rules(auto_control_t *auto_control) {
-	auto_control->self_driving = CD_TRUE;
-	auto_control->advanced_mode = CD_FALSE;
-	auto_control->state_control = CD_FALSE;
-	auto_control->speed_mode = CD_FALSE;
+	auto_control->auto_control_data.self_driving = CD_TRUE;
+	auto_control->auto_control_data.advanced_mode = CD_FALSE;
+	auto_control->auto_control_data.state_control = CD_FALSE;
+	auto_control->auto_control_data.speed_mode = CD_FALSE;
 
-	auto_control->right_light =
+	auto_control->auto_control_data.right_light =
 			auto_control->driving_commands->buttons[AUTO_CONTROL_RIGHT_LIGHT_BUTTON].state;
-	auto_control->left_light =
+	auto_control->auto_control_data.left_light =
 			auto_control->driving_commands->buttons[AUTO_CONTROL_LEFT_LIGHT_BUTTON].state;
-	auto_control->front_light =
+	auto_control->auto_control_data.front_light =
 			auto_control->driving_commands->buttons[AUTO_CONTROL_FRONT_LIGHT_BUTTON].state;
 
-	auto_control->mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+	auto_control->auto_control_data.mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
 
-	auto_control->steering = (int16_t) roundf(
+	auto_control->auto_control_data.steering = (int16_t) roundf(
 			map_value_float(
 					auto_control->driving_commands->wheel_steering_degree,
 					T818_MIN_STEERING_ANGLE, T818_MAX_STEERING_ANGLE,
@@ -111,7 +111,7 @@ inline static void __basic_rules(auto_control_t *auto_control) {
 
 inline static void __moving_rules(auto_control_t *auto_control) {
 	uint16_t braking, speed;
-	auto_control->EBP = CD_FALSE;
+	auto_control->auto_control_data.EBP = CD_FALSE;
 	braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
 	speed = (uint16_t) roundf(
 			auto_control->driving_commands->throttling_module
@@ -123,36 +123,36 @@ inline static void __moving_rules(auto_control_t *auto_control) {
 		speed = AUTO_CONTROL_MIN_SPEED;
 	}
 
-	auto_control->braking = braking;
-	auto_control->speed = speed;
+	auto_control->auto_control_data.braking = braking;
+	auto_control->auto_control_data.speed = speed;
 }
 
 inline static void __neutral_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
-	auto_control->EBP = CD_FALSE;
-	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-	auto_control->braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
-	auto_control->speed = AUTO_CONTROL_MIN_SPEED;
+	auto_control->auto_control_data.EBP = CD_FALSE;
+	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
+	auto_control->auto_control_data.braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
+	auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
 }
 
 inline static void __parking_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
-	auto_control->EBP = CD_TRUE;
-	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
-	auto_control->braking = AUTO_CONTROL_MAX_BRAKING;
-	auto_control->speed = AUTO_CONTROL_MIN_SPEED;
+	auto_control->auto_control_data.EBP = CD_TRUE;
+	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
+	auto_control->auto_control_data.braking = AUTO_CONTROL_MAX_BRAKING;
+	auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
 }
 
 inline static void __retro_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
 	__moving_rules(auto_control);
-	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_RETRO;
+	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_RETRO;
 }
 
 inline static void __drive_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
 	__moving_rules(auto_control);
-	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
+	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
 }
 
 AutoControl_StatusTypeDef auto_control_step(auto_control_t *auto_control) {

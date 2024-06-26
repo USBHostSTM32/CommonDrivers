@@ -42,30 +42,32 @@ typedef uint8_t AutoControl_StatusTypeDef;
 
 #define AUTO_CONTROL_ERROR     			 		((AutoControl_StatusTypeDef) 1U)
 
-
 typedef enum {
 	PARKING, RETRO, NEUTRAL, DRIVE
 } auto_control_state;
 
 typedef struct {
-	bool self_driving :1;
-	bool advanced_mode :1;
-	bool state_control :1;
-	bool speed_mode :1;
-	bool right_light :1;
-	bool left_light :1;
-	bool front_light :1;
-	bool EBP :1;
-	uint8_t mode_selection :4;
-	uint8_t gear_shift :4;
-	int16_t steering;
-	uint16_t braking;
 	uint16_t speed;
+	uint16_t braking;
+	int16_t steering;
+	uint8_t gear_shift :4;
+	uint8_t mode_selection :4;
+	bool EBP :1;
+	bool front_light :1;
+	bool left_light :1;
+	bool right_light :1;
+	bool speed_mode :1;
+	bool state_control :1;
+	bool advanced_mode :1;
+	bool self_driving :1;
+} auto_control_data_t;
+
+typedef struct {
+	auto_control_data_t auto_control_data;
 
 	t818_driving_commands_t *driving_commands;
 	auto_control_state state;
 } auto_control_t;
-
 
 AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
 		t818_driving_commands_t *driving_commands);
