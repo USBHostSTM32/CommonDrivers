@@ -1,193 +1,302 @@
 /*
- * AutoControl.c
+ * @file AutoControl.c
+ * @brief Implementation of the Auto Control Interface
  *
- *  Created on: Jun 24, 2024
- *      Author: vital
+ * This file provides the implementation of the functions declared in the
+ * `auto_control.h` header file. It includes the logic for initializing the
+ * Auto Control module and performing control steps based on input commands
+ * from the `t818_drive_control.h` module.
+ *
+ * Created on: Jun 24, 2024
+ * Authors: Alessio Guarini, Antonio Vitale
  */
 
-#include <auto_control.h>
+#include "auto_control.h"
+
+/**
+ * @brief Checks if the conditions for enabling parking are met.
+ *
+ * This inline function checks if the conditions for enabling parking are met
+ * based on the provided speed and brake commands. It returns `CD_TRUE` if the
+ * speed command is below or equal to the speed threshold and the brake command
+ * is above the braking threshold, indicating that the vehicle can transition
+ * to the PARKING state.
+ *
+ * @param speed_cmd The current speed command.
+ * @param brake_cmd The current brake command.
+ * @return `CD_TRUE` if parking conditions are met, otherwise `CD_FALSE`.
+ */
+static inline bool __check_parking_enable(uint16_t speed_cmd, uint16_t brake_cmd) {
+    static const uint16_t speed_threshold = 0U;                 /**< Threshold for speed command to enable parking */
+    static const uint16_t braking_threshold = T818_BRAKE_MAX / 2; /**< Threshold for brake command to enable parking */
+    bool ret = CD_FALSE;
+
+    if ((speed_cmd <= speed_threshold) && (brake_cmd > braking_threshold)) {
+        ret = CD_TRUE;
+    }
+    return ret;
+}
+
+/**
+ * @brief Updates the Auto Control state in the PARKING state.
+ *
+ * This inline function updates the Auto Control state when the vehicle is in the
+ * PARKING state based on the input commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ * @return The new state of the Auto Control.
+ */
+static inline auto_control_state __update_auto_control_state_parking(auto_control_t *auto_control) {
+    auto_control_state new_state;
+    if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) {
+        new_state = RETRO;
+    } else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED) {
+        new_state = NEUTRAL;
+    } else {
+        new_state = PARKING;
+    }
+    return new_state;
+}
+
+/**
+ * @brief Updates the Auto Control state in the RETRO state.
+ *
+ * This inline function updates the Auto Control state when the vehicle is in the
+ * RETRO state based on the input commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ * @return The new state of the Auto Control.
+ */
+static inline auto_control_state __update_auto_control_state_retro(auto_control_t *auto_control) {
+    auto_control_state new_state;
+    if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) ||
+        (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
+        new_state = NEUTRAL;
+    } else if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
+               (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED)) {
+        new_state = PARKING;
+    } else {
+        new_state = RETRO;
+    }
+    return new_state;
+}
+
+/**
+ * @brief Updates the Auto Control state in the NEUTRAL state.
+ *
+ * This inline function updates the Auto Control state when the vehicle is in the
+ * NEUTRAL state based on the input commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ * @return The new state of the Auto Control.
+ */
+static inline auto_control_state __update_auto_control_state_neutral(auto_control_t *auto_control) {
+    auto_control_state new_state;
+    if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) {
+        new_state = DRIVE;
+    } else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) {
+        new_state = RETRO;
+    } else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED) {
+        new_state = PARKING;
+    } else {
+        new_state = NEUTRAL;
+    }
+    return new_state;
+}
+
+/**
+ * @brief Updates the Auto Control state in the DRIVE state.
+ *
+ * This inline function updates the Auto Control state when the vehicle is in the
+ * DRIVE state based on the input commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ * @return The new state of the Auto Control.
+ */
+static inline auto_control_state __update_auto_control_state_drive(auto_control_t *auto_control) {
+    auto_control_data_t *auto_data = (auto_control_data_t *) &(auto_control->auto_control_data);
+    t818_driving_commands_t *drive_comm = (t818_driving_commands_t *) auto_control->driving_commands;
+    auto_control_state new_state;
+    if ((drive_comm->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
+        (drive_comm->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
+        new_state = NEUTRAL;
+    } else if ((__check_parking_enable(auto_data->speed, auto_data->braking) == CD_TRUE) &&
+               drive_comm->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED) {
+        new_state = PARKING;
+    } else {
+        new_state = DRIVE;
+    }
+    return new_state;
+}
+
+/**
+ * @brief Applies the basic rules for the Auto Control module.
+ *
+ * This inline function applies the basic control rules for the Auto Control module,
+ * setting the necessary data fields based on the current driving commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ */
+static inline void __basic_rules(auto_control_t *auto_control) {
+    auto_control_data_t *auto_data = (auto_control_data_t *) &(auto_control->auto_control_data);
+    t818_driving_commands_t *drive_comm = (t818_driving_commands_t *) auto_control->driving_commands;
+    auto_data->self_driving = CD_TRUE;
+    auto_data->advanced_mode = CD_FALSE;
+    auto_data->state_control = CD_FALSE;
+    auto_data->speed_mode = CD_FALSE;
+
+    auto_data->right_light = drive_comm->buttons[AUTO_CONTROL_RIGHT_LIGHT_BUTTON].state;
+    auto_data->left_light = drive_comm->buttons[AUTO_CONTROL_LEFT_LIGHT_BUTTON].state;
+    auto_data->front_light = drive_comm->buttons[AUTO_CONTROL_FRONT_LIGHT_BUTTON].state;
+
+    auto_data->mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+
+    auto_data->steering = (int16_t) roundf(map_value_float(drive_comm->wheel_steering_degree, T818_MIN_STEERING_ANGLE,
+                                                           T818_MAX_STEERING_ANGLE, AUTO_CONTROL_MIN_STEERING,
+                                                           AUTO_CONTROL_MAX_STEERING));
+}
+
+/**
+ * @brief Applies the moving rules for the Auto Control module.
+ *
+ * This inline function applies the moving control rules for the Auto Control module,
+ * setting the necessary data fields based on the current driving commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ */
+static inline void __moving_rules(auto_control_t *auto_control) {
+    uint16_t braking, speed;
+    auto_control->auto_control_data.EBP = CD_FALSE;
+    braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
+    speed = (uint16_t) roundf(auto_control->driving_commands->throttling_module * AUTO_CONTROL_MAX_SPEED);
+
+    if ((braking > AUTO_CONTROL_MIN_BRAKING) && (speed > AUTO_CONTROL_MIN_SPEED)) {
+        braking = AUTO_CONTROL_MAX_BRAKING;
+        speed = AUTO_CONTROL_MIN_SPEED;
+    }
+
+    auto_control->auto_control_data.braking = braking;
+    auto_control->auto_control_data.speed = speed;
+}
+
+/**
+ * @brief Applies the neutral rules for the Auto Control module.
+ *
+ * This inline function applies the neutral control rules for the Auto Control module,
+ * setting the necessary data fields based on the current driving commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ */
+static inline void __neutral_rules(auto_control_t *auto_control) {
+    __basic_rules(auto_control);
+    auto_control->auto_control_data.EBP = CD_FALSE;
+    auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
+    auto_control->auto_control_data.braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
+    auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
+}
+
+/**
+ * @brief Applies the parking rules for the Auto Control module.
+ *
+ * This inline function applies the parking control rules for the Auto Control module,
+ * setting the necessary data fields based on the current driving commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ */
+static inline void __parking_rules(auto_control_t *auto_control) {
+    __basic_rules(auto_control);
+    auto_control->auto_control_data.EBP = CD_TRUE;
+    auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
+    auto_control->auto_control_data.braking = AUTO_CONTROL_MAX_BRAKING;
+    auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
+}
+
+/**
+ * @brief Applies the retro rules for the Auto Control module.
+ *
+ * This inline function applies the retro control rules for the Auto Control module,
+ * setting the necessary data fields based on the current driving commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ */
+static inline void __retro_rules(auto_control_t *auto_control) {
+    __basic_rules(auto_control);
+    __moving_rules(auto_control);
+    auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_RETRO;
+}
+
+/**
+ * @brief Applies the drive rules for the Auto Control module.
+ *
+ * This inline function applies the drive control rules for the Auto Control module,
+ * setting the necessary data fields based on the current driving commands.
+ *
+ * @param auto_control Pointer to the Auto Control instance.
+ */
+static inline void __drive_rules(auto_control_t *auto_control) {
+    __basic_rules(auto_control);
+    __moving_rules(auto_control);
+    auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
+}
+
 
 AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
-		t818_driving_commands_t *driving_commands) {
-	AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
+                                            t818_driving_commands_t *driving_commands) {
+    AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
 
-	if (auto_control != NULL && driving_commands != NULL) {
-		auto_control->driving_commands = driving_commands;
-		auto_control->auto_control_data.self_driving = CD_FALSE;
-		auto_control->auto_control_data.advanced_mode = CD_FALSE;
-		auto_control->auto_control_data.state_control = CD_FALSE;
-		auto_control->auto_control_data.speed_mode = CD_FALSE;
-		auto_control->auto_control_data.right_light = CD_FALSE;
-		auto_control->auto_control_data.left_light = CD_FALSE;
-		auto_control->auto_control_data.front_light = CD_FALSE;
-		auto_control->auto_control_data.EBP = CD_TRUE;
-		auto_control->auto_control_data.mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
-		auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_PARK;
-		auto_control->auto_control_data.steering = 0;
-		auto_control->auto_control_data.braking = AUTO_CONTROL_MIN_BRAKING;
-		auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
-		auto_control->state = PARKING;
+    if (auto_control != NULL && driving_commands != NULL) {
+        auto_control->driving_commands = driving_commands;
+        auto_control->auto_control_data.self_driving = CD_FALSE;
+        auto_control->auto_control_data.advanced_mode = CD_FALSE;
+        auto_control->auto_control_data.state_control = CD_FALSE;
+        auto_control->auto_control_data.speed_mode = CD_FALSE;
+        auto_control->auto_control_data.right_light = CD_FALSE;
+        auto_control->auto_control_data.left_light = CD_FALSE;
+        auto_control->auto_control_data.front_light = CD_FALSE;
+        auto_control->auto_control_data.EBP = CD_TRUE;
+        auto_control->auto_control_data.mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+        auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_PARK;
+        auto_control->auto_control_data.steering = 0;
+        auto_control->auto_control_data.braking = AUTO_CONTROL_MIN_BRAKING;
+        auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
+        auto_control->state = PARKING;
 
-		status = AUTO_CONTROL_OK;
-	}
+        status = AUTO_CONTROL_OK;
+    }
 
-	return status;
-
-}
-
-static inline auto_control_state __update_auto_control_state_parking(auto_control_t *auto_control){
-	auto_control_state new_state;
-	if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) {
-		new_state = RETRO;
-	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED) {
-		new_state = NEUTRAL;
-	} else {
-		new_state = PARKING;
-	}
-	return new_state;
-}
-
-static inline auto_control_state __update_auto_control_state_retro(auto_control_t *auto_control){
-	auto_control_state new_state;
-	if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) ||
-		(auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
-		new_state = NEUTRAL;
-	} else if (	(auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
-				(auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED)) {
-		new_state = PARKING;
-	} else {
-		new_state = RETRO;
-	}
-	return new_state;
-}
-static inline auto_control_state __update_auto_control_state_neutral(auto_control_t *auto_control){
-	auto_control_state new_state;
-	if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) {
-		new_state = DRIVE;
-	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) {
-		new_state = RETRO;
-	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED) {
-		new_state = PARKING;
-	} else {
-		new_state = NEUTRAL;
-	}
-	return new_state;
-}
-static inline auto_control_state __update_auto_control_state_drive(auto_control_t *auto_control){
-	auto_control_state new_state;
-	if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
-		(auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
-		new_state = NEUTRAL;
-	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED) {
-		new_state = PARKING;
-	} else {
-		new_state = DRIVE;
-	}
-	return new_state;
-}
-
-
-inline static void __basic_rules(auto_control_t *auto_control) {
-	auto_control->auto_control_data.self_driving = CD_TRUE;
-	auto_control->auto_control_data.advanced_mode = CD_FALSE;
-	auto_control->auto_control_data.state_control = CD_FALSE;
-	auto_control->auto_control_data.speed_mode = CD_FALSE;
-
-	auto_control->auto_control_data.right_light =
-			auto_control->driving_commands->buttons[AUTO_CONTROL_RIGHT_LIGHT_BUTTON].state;
-	auto_control->auto_control_data.left_light =
-			auto_control->driving_commands->buttons[AUTO_CONTROL_LEFT_LIGHT_BUTTON].state;
-	auto_control->auto_control_data.front_light =
-			auto_control->driving_commands->buttons[AUTO_CONTROL_FRONT_LIGHT_BUTTON].state;
-
-	auto_control->auto_control_data.mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
-
-	auto_control->auto_control_data.steering = (int16_t) roundf(
-			map_value_float(
-					auto_control->driving_commands->wheel_steering_degree,
-					T818_MIN_STEERING_ANGLE, T818_MAX_STEERING_ANGLE,
-					AUTO_CONTROL_MIN_STEERING, AUTO_CONTROL_MAX_STEERING));
-}
-
-inline static void __moving_rules(auto_control_t *auto_control) {
-	uint16_t braking, speed;
-	auto_control->auto_control_data.EBP = CD_FALSE;
-	braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
-	speed = (uint16_t) roundf(
-			auto_control->driving_commands->throttling_module
-					* AUTO_CONTROL_MAX_SPEED);
-
-	if ((braking > AUTO_CONTROL_MIN_BRAKING)
-			&& (speed > AUTO_CONTROL_MIN_SPEED)) {
-		braking = AUTO_CONTROL_MAX_BRAKING;
-		speed = AUTO_CONTROL_MIN_SPEED;
-	}
-
-	auto_control->auto_control_data.braking = braking;
-	auto_control->auto_control_data.speed = speed;
-}
-
-inline static void __neutral_rules(auto_control_t *auto_control) {
-	__basic_rules(auto_control);
-	auto_control->auto_control_data.EBP = CD_FALSE;
-	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-	auto_control->auto_control_data.braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
-	auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
-}
-
-inline static void __parking_rules(auto_control_t *auto_control) {
-	__basic_rules(auto_control);
-	auto_control->auto_control_data.EBP = CD_TRUE;
-	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-	auto_control->auto_control_data.braking = AUTO_CONTROL_MAX_BRAKING;
-	auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
-}
-
-inline static void __retro_rules(auto_control_t *auto_control) {
-	__basic_rules(auto_control);
-	__moving_rules(auto_control);
-	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_RETRO;
-}
-
-inline static void __drive_rules(auto_control_t *auto_control) {
-	__basic_rules(auto_control);
-	__moving_rules(auto_control);
-	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
+    return status;
 }
 
 AutoControl_StatusTypeDef auto_control_step(auto_control_t *auto_control) {
-	AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
+    AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
 
-	if (auto_control != NULL) {
+    if (auto_control != NULL) {
+        switch (auto_control->state) {
+            case PARKING:
+                __parking_rules(auto_control);
+                auto_control->state = __update_auto_control_state_parking(auto_control);
+                status = AUTO_CONTROL_OK;
+                break;
+            case RETRO:
+                __retro_rules(auto_control);
+                auto_control->state = __update_auto_control_state_retro(auto_control);
+                status = AUTO_CONTROL_OK;
+                break;
+            case NEUTRAL:
+                __neutral_rules(auto_control);
+                auto_control->state = __update_auto_control_state_neutral(auto_control);
+                status = AUTO_CONTROL_OK;
+                break;
+            case DRIVE:
+                __drive_rules(auto_control);
+                auto_control->state = __update_auto_control_state_drive(auto_control);
+                status = AUTO_CONTROL_OK;
+                break;
+            default:
+                break;
+        }
+        status = AUTO_CONTROL_OK;
+    }
 
-		switch (auto_control->state) {
-		case PARKING:
-			__parking_rules(auto_control);
-			auto_control->state = __update_auto_control_state_parking(auto_control);
-			status = AUTO_CONTROL_OK;
-			break;
-		case RETRO:
-			__retro_rules(auto_control);
-			auto_control->state = __update_auto_control_state_retro(auto_control);
-			status = AUTO_CONTROL_OK;
-			break;
-		case NEUTRAL:
-			__neutral_rules(auto_control);
-			auto_control->state = __update_auto_control_state_neutral(auto_control);
-			status = AUTO_CONTROL_OK;
-			break;
-		case DRIVE:
-			__drive_rules(auto_control);
-			auto_control->state = __update_auto_control_state_drive(auto_control);
-			status = AUTO_CONTROL_OK;
-			break;
-		default:
-			break;
-
-		}
-
-		status = AUTO_CONTROL_OK;
-	}
-
-	return status;
+    return status;
 }

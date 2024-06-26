@@ -1,18 +1,45 @@
 /*
- * can_parser.c
+ * @file can_parser.c
+ * @brief Implementation of the CAN Parser Interface
  *
- *  Created on: Jun 25, 2024
- *      Author: vital
+ * This file provides the implementation of the functions declared in the
+ * `can_parser.h` header file. It includes the logic for translating
+ * logical values from the Auto Control module into a CAN frame payload.
+ *
+ * Created on: Jun 25, 2024
+ * Authors: Alessio Guarini, Antonio Vitale
  */
 
 #include "can_parser.h"
 
+/**
+ * @brief Fits bits into the specified position in the data array.
+ *
+ * This inline function inserts the specified value into the data array
+ * at the specified position, applying the given shift and mask.
+ *
+ * @param data Pointer to the data array.
+ * @param value The value to be inserted.
+ * @param position The position in the data array.
+ * @param shift The bit shift to be applied.
+ * @param mask The bit mask to be applied.
+ */
 static inline void __fit_bits(uint8_t* data,uint8_t value,uint8_t position,uint8_t shift,uint8_t mask)
 {
 	data[position]&=(~(mask<<shift));
 	data[position]|=value<<shift;
 }
 
+/**
+ * @brief Fits bytes into the specified position in the data array.
+ *
+ * This inline function inserts the specified 16-bit value into the data array
+ * at the specified position, splitting it into two bytes (little endian).
+ *
+ * @param data Pointer to the data array.
+ * @param value The 16-bit value to be inserted.
+ * @param position The position in the data array.
+ */
 static inline void __fit_bytes(uint8_t* data,uint16_t value,uint8_t position)
 {
 	data[position]=value;
