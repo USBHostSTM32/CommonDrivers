@@ -25,7 +25,7 @@ typedef uint8_t CanManager_StatusTypeDef;
 typedef struct {
 	CAN_HandleTypeDef *hcan; /**< Pointer to the CAN handle */
 	uint32_t auto_control_tx_mailbox;
-	CAN_TxHeaderTypeDef auto_control_tx_header;
+	const CAN_TxHeaderTypeDef auto_control_tx_header;
 	uint32_t auto_data_feedback_rx_fifo;
 }can_manager_config_t;
 
