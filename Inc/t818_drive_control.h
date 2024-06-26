@@ -98,14 +98,6 @@ typedef struct {
  */
 #define T818_DC_ERROR     			 ((T818DriveControl_StatusTypeDef) 1U)
 
-#define T818_WHEEL_READY				(1U)
-
-#define T818_WHEEL_NOT_READY			(0U)
-
-#define T818_WHEEL_LINKED				(1U)
-
-#define T818_WHEEL_NOT_LINKED			(0U)
-
 #define T818_PEDAL_INCREMENT			(0.01f)
 
 #define T818_PEDAL_DECREMENT			(0.01f)

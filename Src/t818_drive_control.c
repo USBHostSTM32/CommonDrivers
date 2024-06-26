@@ -128,12 +128,12 @@ static inline T818DriveControl_StatusTypeDef __t818_drive_control_update(
 	return status;
 }
 
-static inline bool __check_wheel_is_linked(
+static inline bool8u __check_wheel_is_linked(
 		t818_drive_control_t *t818_drive_control) {
-	bool wheel_linked = CD_FALSE;
+	bool8u wheel_linked = CD_FALSE;
 
 	if (t818_drive_control->config->t818_host_handle->pActiveClass != NULL) {
-		HID_HandleTypeDef *active_class = (HID_HandleTypeDef*) t818_drive_control->config->t818_host_handle->pActiveClass->pData;
+		const HID_HandleTypeDef *active_class = (HID_HandleTypeDef*) t818_drive_control->config->t818_host_handle->pActiveClass->pData;
 		if (active_class->state == USBH_HID_POLL) {
 			wheel_linked = CD_TRUE;
 		}
@@ -141,7 +141,7 @@ static inline bool __check_wheel_is_linked(
 	return wheel_linked;
 }
 
-static inline bool __check_wheel_is_ready(
+static inline bool8u __check_wheel_is_ready(
 		t818_drive_control_t *t818_drive_control) {
 	uint8_t wheel_ready = CD_FALSE;
 

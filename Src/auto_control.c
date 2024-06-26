@@ -26,10 +26,10 @@
  * @param brake_cmd The current brake command.
  * @return `CD_TRUE` if parking conditions are met, otherwise `CD_FALSE`.
  */
-static inline bool __check_parking_enable(uint16_t speed_cmd, uint16_t brake_cmd) {
-    static const uint16_t speed_threshold = 0U;                 /**< Threshold for speed command to enable parking */
-    static const uint16_t braking_threshold = T818_BRAKE_MAX / 2; /**< Threshold for brake command to enable parking */
-    bool ret = CD_FALSE;
+static inline bool8u __check_parking_enable(uint16_t speed_cmd, uint16_t brake_cmd) {
+    static const uint16_t speed_threshold = 10U;                 /**< Threshold for speed command to enable parking */
+    static const uint16_t braking_threshold = T818_BRAKE_MAX / 2U; /**< Threshold for brake command to enable parking */
+    bool8u ret = CD_FALSE;
 
     if ((speed_cmd <= speed_threshold) && (brake_cmd > braking_threshold)) {
         ret = CD_TRUE;
@@ -114,8 +114,8 @@ static inline auto_control_state __update_auto_control_state_neutral(auto_contro
  * @return The new state of the Auto Control.
  */
 static inline auto_control_state __update_auto_control_state_drive(auto_control_t *auto_control) {
-    auto_control_data_t *auto_data = (auto_control_data_t *) &(auto_control->auto_control_data);
-    t818_driving_commands_t *drive_comm = (t818_driving_commands_t *) auto_control->driving_commands;
+    const auto_control_data_t *auto_data = (auto_control_data_t *) &(auto_control->auto_control_data);
+    const t818_driving_commands_t *drive_comm = (t818_driving_commands_t *) auto_control->driving_commands;
     auto_control_state new_state;
     if ((drive_comm->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
         (drive_comm->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
@@ -138,8 +138,8 @@ static inline auto_control_state __update_auto_control_state_drive(auto_control_
  * @param auto_control Pointer to the Auto Control instance.
  */
 static inline void __basic_rules(auto_control_t *auto_control) {
-    auto_control_data_t *auto_data = (auto_control_data_t *) &(auto_control->auto_control_data);
-    t818_driving_commands_t *drive_comm = (t818_driving_commands_t *) auto_control->driving_commands;
+    auto_control_data_t *const auto_data = (auto_control_data_t *) &(auto_control->auto_control_data);
+    const t818_driving_commands_t *drive_comm = (t818_driving_commands_t *) auto_control->driving_commands;
     auto_data->self_driving = CD_TRUE;
     auto_data->advanced_mode = CD_FALSE;
     auto_data->state_control = CD_FALSE;
@@ -165,10 +165,11 @@ static inline void __basic_rules(auto_control_t *auto_control) {
  * @param auto_control Pointer to the Auto Control instance.
  */
 static inline void __moving_rules(auto_control_t *auto_control) {
-    uint16_t braking, speed;
+    uint16_t braking;
+	uint16_t speed;
     auto_control->auto_control_data.EBP = CD_FALSE;
-    braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
-    speed = (uint16_t) roundf(auto_control->driving_commands->throttling_module * AUTO_CONTROL_MAX_SPEED);
+    braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * ((float)AUTO_CONTROL_MAX_BRAKING));
+    speed = (uint16_t) roundf(auto_control->driving_commands->throttling_module *((float) AUTO_CONTROL_MAX_SPEED));
 
     if ((braking > AUTO_CONTROL_MIN_BRAKING) && (speed > AUTO_CONTROL_MIN_SPEED)) {
         braking = AUTO_CONTROL_MAX_BRAKING;
@@ -191,7 +192,7 @@ static inline void __neutral_rules(auto_control_t *auto_control) {
     __basic_rules(auto_control);
     auto_control->auto_control_data.EBP = CD_FALSE;
     auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-    auto_control->auto_control_data.braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
+    auto_control->auto_control_data.braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * ((float)AUTO_CONTROL_MAX_BRAKING));
     auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
 }
 
@@ -244,7 +245,7 @@ AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
                                             t818_driving_commands_t *driving_commands) {
     AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
 
-    if (auto_control != NULL && driving_commands != NULL) {
+    if ((auto_control != NULL) && (driving_commands != NULL)) {
         auto_control->driving_commands = driving_commands;
         auto_control->auto_control_data.self_driving = CD_FALSE;
         auto_control->auto_control_data.advanced_mode = CD_FALSE;
@@ -295,7 +296,6 @@ AutoControl_StatusTypeDef auto_control_step(auto_control_t *auto_control) {
             default:
                 break;
         }
-        status = AUTO_CONTROL_OK;
     }
 
     return status;

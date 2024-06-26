@@ -43,7 +43,7 @@ static inline void __fit_bits(uint8_t* data,uint8_t value,uint8_t position,uint8
 static inline void __fit_bytes(uint8_t* data,uint16_t value,uint8_t position)
 {
 	data[position]=value;
-	data[position+1]=value>>8;
+	data[position+1]=value>>((uint16_t)8U);
 }
 
 CanParser_StatusTypeDef can_parser_from_auto_control_to_array(auto_control_data_t auto_control_data,uint8_t* data)

@@ -35,7 +35,6 @@ typedef uint8_t CanManager_StatusTypeDef;
  */
 typedef struct {
     CAN_HandleTypeDef *hcan;                         /**< Pointer to the CAN handle */
-    uint32_t auto_control_tx_mailbox;                /**< Mailbox for auto control transmission */
     const CAN_TxHeaderTypeDef auto_control_tx_header; /**< Header for auto control transmission */
     uint32_t auto_data_feedback_rx_fifo;             /**< FIFO for auto data feedback reception */
     uint32_t auto_data_feedback_rx_interrupt;        /**< Interrupt for auto data feedback reception */
@@ -48,6 +47,7 @@ typedef struct {
  */
 typedef struct {
     can_manager_config_t const *config; /**< Pointer to the CAN Manager configuration */
+    uint32_t auto_control_tx_mailbox;                /**< Mailbox for auto control transmission */
     uint8_t n_tries;                   /**< Number of transmission tries */
 } can_manager_t;
 

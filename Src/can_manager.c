@@ -28,10 +28,11 @@ CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager, const can_
 CanManager_StatusTypeDef can_manager_auto_control_tx(can_manager_t *can_manager, const uint8_t *can_data) {
     CanManager_StatusTypeDef status = CAN_MANAGER_ERROR;
     if ((can_manager != NULL) && (can_data != NULL)) {
-        can_manager_config_t *config = (can_manager_config_t*) can_manager->config;
-        if (HAL_CAN_IsTxMessagePending(config->hcan, config->auto_control_tx_mailbox) == 0U) {
+        const can_manager_config_t *config = (const can_manager_config_t*) can_manager->config;
+        if (HAL_CAN_IsTxMessagePending(config->hcan, can_manager->auto_control_tx_mailbox) == 0U) {
             can_manager->n_tries = 0U;
-            if (HAL_CAN_AddTxMessage(config->hcan, &(config->auto_control_tx_header), can_data, &(config->auto_control_tx_mailbox)) == HAL_OK) {
+            uint32_t *pTxMailbox =  (uint32_t *) &can_manager->auto_control_tx_mailbox;
+            if (HAL_CAN_AddTxMessage(config->hcan, &(config->auto_control_tx_header), can_data, pTxMailbox) == HAL_OK) {
                 status = CAN_MANAGER_OK;
             }
         } else {

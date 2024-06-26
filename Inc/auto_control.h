@@ -22,6 +22,7 @@
 #ifndef INC_AUTO_CONTROL_H_
 #define INC_AUTO_CONTROL_H_
 
+#include "common_drivers.h"
 #include "t818_drive_control.h"
 
 /* Button Definitions -------------------------------------------------------*/
@@ -108,16 +109,16 @@ typedef struct {
     uint16_t speed;             /**< Speed command */
     uint16_t braking;           /**< Braking command */
     int16_t steering;           /**< Steering command */
-    uint8_t gear_shift :4;      /**< Gear shift command */
-    uint8_t mode_selection :4;  /**< Mode selection command */
-    bool EBP :1;                /**< Electronic Parking Brake status */
-    bool front_light :1;        /**< Front light status */
-    bool left_light :1;         /**< Left light status */
-    bool right_light :1;        /**< Right light status */
-    bool speed_mode :1;         /**< Speed mode status */
-    bool state_control :1;      /**< State control status */
-    bool advanced_mode :1;      /**< Advanced mode status */
-    bool self_driving :1;       /**< Self-driving mode status */
+    uint8_t gear_shift;      /**< Gear shift command */
+    uint8_t mode_selection;  /**< Mode selection command */
+    bool8u EBP;                /**< Electronic Parking Brake status */
+    bool8u front_light;        /**< Front light status */
+    bool8u left_light;         /**< Left light status */
+    bool8u right_light;        /**< Right light status */
+    bool8u speed_mode;         /**< Speed mode status */
+    bool8u state_control;      /**< State control status */
+    bool8u advanced_mode;      /**< Advanced mode status */
+    bool8u self_driving;       /**< Self-driving mode status */
 } auto_control_data_t;
 
 /**
