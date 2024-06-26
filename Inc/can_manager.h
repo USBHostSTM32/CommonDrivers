@@ -27,6 +27,7 @@ typedef struct {
 	uint32_t auto_control_tx_mailbox;
 	const CAN_TxHeaderTypeDef auto_control_tx_header;
 	uint32_t auto_data_feedback_rx_fifo;
+	uint32_t auto_data_feedback_rx_interrupt;
 }can_manager_config_t;
 
 typedef struct {
