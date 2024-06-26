@@ -192,7 +192,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(t818_drive_control_t *t81
 				t818_drive_control->state = READING_WHEEL;
 			} else {
 				t818_drive_control->t818_driving_commands.braking_module = __calculate_new_smoothed_value(t818_drive_control->t818_driving_commands.braking_module, T818_BRAKING_SET_POINT, T818_PEDAL_INCREMENT, T818_PEDAL_DECREMENT);
-				t818_drive_control->t818_driving_commands.throttling_module = __calculate_new_smoothed_value(t818_drive_control->t818_driving_commands.throttling_module, T818_THROTTLING_SET_POINT, T818_PEDAL_INCREMENT, T818_PEDAL_DECREMENT);
+				t818_drive_control->t818_driving_commands.throttling_module = 0;
 			}
 			status = T818_DC_OK;
 			break;
