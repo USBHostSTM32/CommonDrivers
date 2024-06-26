@@ -35,81 +35,57 @@ AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
 
 }
 
-static void __update_auto_control_state(auto_control_t *auto_control) {
-	switch (auto_control->state) {
-	case PARKING:
-		if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = RETRO;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = PARKING;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = NEUTRAL;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = PARKING;
-		} else {
-			auto_control->state = PARKING;
-		}
-		break;
-	case RETRO:
-		if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = NEUTRAL;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = PARKING;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = NEUTRAL;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = PARKING;
-		} else {
-			auto_control->state = RETRO;
-		}
-		break;
-	case NEUTRAL:
-		if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = DRIVE;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = RETRO;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = NEUTRAL;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = PARKING;
-		} else {
-			auto_control->state = NEUTRAL;
-		}
-		break;
-	case DRIVE:
-		if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = DRIVE;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = NEUTRAL;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = NEUTRAL;
-		} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
-				== BUTTON_PRESSED) {
-			auto_control->state = PARKING;
-		} else {
-			auto_control->state = DRIVE;
-		}
-		break;
-	default:
-		break;
-
+static inline auto_control_state __update_auto_control_state_parking(auto_control_t *auto_control){
+	auto_control_state new_state;
+	if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) {
+		new_state = RETRO;
+	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED) {
+		new_state = NEUTRAL;
+	} else {
+		new_state = PARKING;
 	}
+	return new_state;
 }
+
+static inline auto_control_state __update_auto_control_state_retro(auto_control_t *auto_control){
+	auto_control_state new_state;
+	if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) ||
+		(auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
+		new_state = NEUTRAL;
+	} else if (	(auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
+				(auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED)) {
+		new_state = PARKING;
+	} else {
+		new_state = RETRO;
+	}
+	return new_state;
+}
+static inline auto_control_state __update_auto_control_state_neutral(auto_control_t *auto_control){
+	auto_control_state new_state;
+	if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state == BUTTON_PRESSED) {
+		new_state = DRIVE;
+	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) {
+		new_state = RETRO;
+	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED) {
+		new_state = PARKING;
+	} else {
+		new_state = NEUTRAL;
+	}
+	return new_state;
+}
+static inline auto_control_state __update_auto_control_state_drive(auto_control_t *auto_control){
+	auto_control_state new_state;
+	if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_DOWN_BUTTON].state == BUTTON_PRESSED) ||
+		(auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state == BUTTON_PRESSED)) {
+		new_state = NEUTRAL;
+	} else if (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state == BUTTON_PRESSED) {
+		new_state = PARKING;
+	} else {
+		new_state = DRIVE;
+	}
+	return new_state;
+}
+
 
 inline static void __basic_rules(auto_control_t *auto_control) {
 	auto_control->self_driving = CD_TRUE;
@@ -136,9 +112,7 @@ inline static void __basic_rules(auto_control_t *auto_control) {
 inline static void __moving_rules(auto_control_t *auto_control) {
 	uint16_t braking, speed;
 	auto_control->EBP = CD_FALSE;
-	braking = (uint16_t) roundf(
-			auto_control->driving_commands->braking_module
-					* AUTO_CONTROL_MAX_BRAKING);
+	braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
 	speed = (uint16_t) roundf(
 			auto_control->driving_commands->throttling_module
 					* AUTO_CONTROL_MAX_SPEED);
@@ -157,7 +131,7 @@ inline static void __neutral_rules(auto_control_t *auto_control) {
 	__basic_rules(auto_control);
 	auto_control->EBP = CD_FALSE;
 	auto_control->gear_shift = AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-	auto_control->braking = AUTO_CONTROL_MAX_BRAKING;
+	auto_control->braking = (uint16_t) roundf(auto_control->driving_commands->braking_module * AUTO_CONTROL_MAX_BRAKING);
 	auto_control->speed = AUTO_CONTROL_MIN_SPEED;
 }
 
@@ -189,22 +163,22 @@ AutoControl_StatusTypeDef auto_control_step(auto_control_t *auto_control) {
 		switch (auto_control->state) {
 		case PARKING:
 			__parking_rules(auto_control);
-			__update_auto_control_state(auto_control);
+			auto_control->state = __update_auto_control_state_parking(auto_control);
 			status = AUTO_CONTROL_OK;
 			break;
 		case RETRO:
 			__retro_rules(auto_control);
-			__update_auto_control_state(auto_control);
+			auto_control->state = __update_auto_control_state_retro(auto_control);
 			status = AUTO_CONTROL_OK;
 			break;
 		case NEUTRAL:
 			__neutral_rules(auto_control);
-			__update_auto_control_state(auto_control);
+			auto_control->state = __update_auto_control_state_neutral(auto_control);
 			status = AUTO_CONTROL_OK;
 			break;
 		case DRIVE:
 			__drive_rules(auto_control);
-			__update_auto_control_state(auto_control);
+			auto_control->state = __update_auto_control_state_drive(auto_control);
 			status = AUTO_CONTROL_OK;
 			break;
 		default:
