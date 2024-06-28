@@ -27,6 +27,7 @@
  */
 typedef uint8_t T818DriveControl_StatusTypeDef;
 
+/* Enumeration Definitions -----------------------------------------------*/
 /**
  * @brief T818 Drive Control Configuration Structure
  *
@@ -58,6 +59,7 @@ typedef enum {
    READING_WHEEL
 } t818_drive_control_state;
 
+/* Data Structure Definitions -----------------------------------------------*/
 /**
  * @brief T818 Driving Commands Structure
  *
@@ -127,23 +129,5 @@ T818DriveControl_StatusTypeDef t818_drive_control_init(
 
 T818DriveControl_StatusTypeDef t818_drive_control_step(
     t818_drive_control_t *t818_drive_control);
-
-/**
- * @brief Retrieves the current driving commands from the T818 Drive Control module.
- *
- * @param t818_drive_control Pointer to the T818 Drive Control state structure.
- * @param t818_driving_commands Pointer to the structure to store the current driving commands.
- * @return T818DriveControl_StatusTypeDef Status of the retrieval process.
- */
-inline T818DriveControl_StatusTypeDef t818_drive_control_get_driving_commands(
-    t818_drive_control_t *t818_drive_control,
-    t818_driving_commands_t *t818_driving_commands) {
-    T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
-    if ((t818_drive_control != NULL) && (t818_driving_commands != NULL)) {
-        *t818_driving_commands = t818_drive_control->t818_driving_commands;
-        status = T818_DC_OK;
-    }
-    return status;
-}
 
 #endif /* INC_T818_DRIVE_CONTROL_H_ */

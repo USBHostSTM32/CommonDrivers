@@ -242,7 +242,6 @@ USBH_StatusTypeDef USBH_HID_T818Init(USBH_HandleTypeDef *phost)
   return status;
 }
 
-//ADD DOXYGEN
 USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost)
 {
 	USBH_StatusTypeDef status=USBH_FAIL;
@@ -256,7 +255,7 @@ USBH_StatusTypeDef USBH_HID_GetT818Info(USBH_HandleTypeDef *phost)
 
 }
 
-//ADD DOXYGEN
+
 HID_T818_Info_TypeDef* USBH_HID_T818GetInstance()
 {
 	return &t818_info;

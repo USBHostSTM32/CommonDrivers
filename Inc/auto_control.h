@@ -51,7 +51,7 @@
 
 /* Gear Shift Definitions ---------------------------------------------------*/
 /** @brief Gear shift park definition */
-#define AUTO_CONTROL_GEAR_SHIFT_PARK          (1U)
+#define AUTO_CONTROL_GEAR_SHIFT_PARK          (2U)
 /** @brief Gear shift drive definition */
 #define AUTO_CONTROL_GEAR_SHIFT_DRIVE         (1U)
 /** @brief Gear shift retro definition */

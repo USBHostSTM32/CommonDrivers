@@ -65,6 +65,7 @@ typedef enum {
     STATE_CHANGED /**< Button state has changed */
 } button_long_pressed_enum;
 
+/* Data Structure Definitions -----------------------------------------------*/
 /**
  * @brief Button structure definition.
  *
@@ -162,21 +163,5 @@ Button_StatusTypeDef button_init(button_t *button, is_pressed_func function);
  * @return Button_StatusTypeDef Status of the update process.
  */
 Button_StatusTypeDef button_update(button_t *button, uint8_t new_raw_state);
-
-/**
- * @brief Retrieves the current state of the button.
- *
- * @param button Pointer to the button structure.
- * @param state Pointer to store the current state of the button.
- * @return Button_StatusTypeDef Status of the retrieval process.
- */
-inline Button_StatusTypeDef button_get_state(const button_t *button, uint8_t *state) {
-    Button_StatusTypeDef status = BUTTON_ERROR;
-    if ((button != NULL) && (state != NULL)) {
-        *state = button->state;
-        status = BUTTON_OK;
-    }
-    return status;
-}
 
 #endif /* INC_BUTTON_H_ */

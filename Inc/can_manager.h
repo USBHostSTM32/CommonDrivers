@@ -28,6 +28,7 @@
  */
 typedef uint8_t CanManager_StatusTypeDef;
 
+/* Data Structure Definitions -----------------------------------------------*/
 /**
  * @brief Configuration structure for CAN Manager.
  *
