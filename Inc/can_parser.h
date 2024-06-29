@@ -103,6 +103,73 @@ typedef uint8_t CanParser_StatusTypeDef;
 /** @brief Self-driving bit mask */
 #define CAN_PARSER_SELF_DRIVING_MASK         (0b00000001)
 
+
+/* Byte Position Definitions ------------------------------------------------*/
+/** @brief Emergency stop feedback byte position */
+#define CAN_PARSER_EMERGENCY_STOP_FEEDBACK_BYTE      (7U)
+/** @brief Vehicle mode feedback byte position */
+#define CAN_PARSER_VEHICLE_MODE_FEEDBACK_BYTE        (7U)
+/** @brief Vehicle status feedback byte position */
+#define CAN_PARSER_VEHICLE_STATUS_FEEDBACK_BYTE      (7U)
+/** @brief Braking light feedback byte position */
+#define CAN_PARSER_BRAKING_LIGHT_FEEDBACK_BYTE       (7U)
+/** @brief Tail light feedback byte position */
+#define CAN_PARSER_TAIL_LIGHT_FEEDBACK_BYTE          (7U)
+/** @brief Right steer light feedback byte position */
+#define CAN_PARSER_R_STEER_LIGHT_FEEDBACK_BYTE       (7U)
+/** @brief Left steer light feedback byte position */
+#define CAN_PARSER_L_STEER_LIGHT_FEEDBACK_BYTE       (7U)
+/** @brief Mode feedback byte position */
+#define CAN_PARSER_MODE_FEEDBACK_BYTE                (6U)
+/** @brief Gear feedback byte position */
+#define CAN_PARSER_GEAR_FEEDBACK_BYTE                (6U)
+/** @brief Braking feedback byte position */
+#define CAN_PARSER_BRAKING_FEEDBACK_BYTE             (4U)
+/** @brief Front steer feedback byte position */
+#define CAN_PARSER_STEER_FEEDBACK_BYTE             (2U)
+/** @brief Speed feedback byte position */
+#define CAN_PARSER_SPEED_FEEDBACK_BYTE               (0U)
+
+/* Bit Shift Definitions ----------------------------------------------------*/
+/** @brief Emergency stop feedback bit shift */
+#define CAN_PARSER_EMERGENCY_STOP_FEEDBACK_SHIFT     (6U)
+/** @brief Vehicle mode feedback bit shift */
+#define CAN_PARSER_VEHICLE_MODE_FEEDBACK_SHIFT       (5U)
+/** @brief Vehicle status feedback bit shift */
+#define CAN_PARSER_VEHICLE_STATUS_FEEDBACK_SHIFT     (4U)
+/** @brief Braking light feedback bit shift */
+#define CAN_PARSER_BRAKING_LIGHT_FEEDBACK_SHIFT      (3U)
+/** @brief Tail light feedback bit shift */
+#define CAN_PARSER_TAIL_LIGHT_FEEDBACK_SHIFT         (2U)
+/** @brief Right steer light feedback bit shift */
+#define CAN_PARSER_R_STEER_LIGHT_FEEDBACK_SHIFT      (1U)
+/** @brief Left steer light feedback bit shift */
+#define CAN_PARSER_L_STEER_LIGHT_FEEDBACK_SHIFT      (0U)
+/** @brief Mode feedback bit shift */
+#define CAN_PARSER_MODE_FEEDBACK_SHIFT               (4U)
+/** @brief Gear feedback bit shift */
+#define CAN_PARSER_GEAR_FEEDBACK_SHIFT               (0U)
+
+/* Bit Mask Definitions -----------------------------------------------------*/
+/** @brief Emergency stop feedback bit mask */
+#define CAN_PARSER_EMERGENCY_STOP_FEEDBACK_MASK      (0b01000000)
+/** @brief Vehicle mode feedback bit mask */
+#define CAN_PARSER_VEHICLE_MODE_FEEDBACK_MASK        (0b00110000)
+/** @brief Vehicle status feedback bit mask */
+#define CAN_PARSER_VEHICLE_STATUS_FEEDBACK_MASK      (0b00010000)
+/** @brief Braking light feedback bit mask */
+#define CAN_PARSER_BRAKING_LIGHT_FEEDBACK_MASK       (0b00001000)
+/** @brief Tail light feedback bit mask */
+#define CAN_PARSER_TAIL_LIGHT_FEEDBACK_MASK          (0b00000100)
+/** @brief Right steer light feedback bit mask */
+#define CAN_PARSER_R_STEER_LIGHT_FEEDBACK_MASK       (0b00000010)
+/** @brief Left steer light feedback bit mask */
+#define CAN_PARSER_L_STEER_LIGHT_FEEDBACK_MASK       (0b00000001)
+/** @brief Mode feedback bit mask */
+#define CAN_PARSER_MODE_FEEDBACK_MASK                (0b00110000)
+/** @brief Gear feedback bit mask */
+#define CAN_PARSER_GEAR_FEEDBACK_MASK                (0b00000011)
+
 /* Function Prototypes ------------------------------------------------------*/
 /**
  * @brief Converts Auto Control data to CAN frame payload.
@@ -116,5 +183,7 @@ typedef uint8_t CanParser_StatusTypeDef;
  * @return CAN_PARSER_OK if the conversion was successful, otherwise CAN_PARSER_ERROR.
  */
 CanParser_StatusTypeDef can_parser_from_auto_control_to_array(auto_control_data_t auto_control_data, uint8_t* data);
+
+CanParser_StatusTypeDef can_parser_from_array_to_auto_control_feedback(uint8_t* data,auto_data_feedback_t *auto_data_feedback);
 
 #endif /* INC_CAN_PARSER_H_ */

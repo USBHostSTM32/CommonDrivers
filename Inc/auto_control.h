@@ -45,7 +45,7 @@
 /** @brief Mode selection different definition */
 #define AUTO_CONTROL_MODE_SELECTION_DIFFERENT (1U)
 /** @brief Mode selection field definition */
-#define AUTO_CONTROL_MODE_SELECTION_FIELD     (1U)
+#define AUTO_CONTROL_MODE_SELECTION_FIELD     (2U)
 /** @brief Mode selection same definition */
 #define AUTO_CONTROL_MODE_SELECTION_SAME      (3U)
 
@@ -77,6 +77,34 @@
 /** @brief Minimum steering definition */
 #define AUTO_CONTROL_MIN_STEERING             (-1024)
 
+
+#define AUTO_DATA_FEEDBACK_SPEED_MIN 						(-600)
+#define AUTO_DATA_FEEDBACK_SPEED_MAX 						(600)
+#define AUTO_DATA_FEEDBACK_SPEED_ZERO 						(0)
+
+#define AUTO_DATA_FEEDBACK_STEER_MIN 						(-300)
+#define AUTO_DATA_FEEDBACK_STEER_MAX 						(300)
+#define AUTO_DATA_FEEDBACK_STEER_ZERO 						(0)
+
+#define AUTO_DATA_FEEDBACK_BRAKING_MIN 						(0U)
+#define AUTO_DATA_FEEDBACK_BRAKING_MAX 						(1000U)
+
+#define AUTO_DATA_FEEDBACK_GEAR_PARK          				(2U)
+#define AUTO_DATA_FEEDBACK_GEAR_DRIVE         				(1U)
+#define AUTO_DATA_FEEDBACK_GEAR_RETRO         				(3U)
+#define AUTO_DATA_FEEDBACK_GEAR_NEUTRAL       				(2U)
+
+#define AUTO_DATA_FEEDBACK_MODE_FRONT_AND_REAR				(1U)
+#define AUTO_DATA_FEEDBACK_MODE_GENERAL						(1U)
+#define AUTO_DATA_FEEDBACK_MODE_BACK_AND_FORTH      		(3U)
+
+#define AUTO_DATA_FEEDBACK_VEICHLE_STATUS_NORMAL			(0U)
+#define AUTO_DATA_FEEDBACK_VEICHLE_STATUS_ABNORMAL			(1U)
+
+#define AUTO_DATA_FEEDBACK_VEICHLE_MODE_REMOTE_CONTROL		(0U)
+#define AUTO_DATA_FEEDBACK_VEICHLE_MODE_AUTONOMOUS_DRIVING	(1U)
+
+
 /* Status Type Definition ---------------------------------------------------*/
 /** @brief Status type definition for Auto Control */
 typedef uint8_t AutoControl_StatusTypeDef;
@@ -92,10 +120,10 @@ typedef uint8_t AutoControl_StatusTypeDef;
  * @brief Enumeration representing the Auto Control state
  */
 typedef enum {
-    PARKING, /**< Parking state */
-    RETRO,   /**< Reverse gear state */
-    NEUTRAL, /**< Neutral gear state */
-    DRIVE    /**< Drive gear state */
+	PARKING, /**< Parking state */
+	RETRO, /**< Reverse gear state */
+	NEUTRAL, /**< Neutral gear state */
+	DRIVE /**< Drive gear state */
 } auto_control_state;
 
 /* Data Structure Definitions -----------------------------------------------*/
@@ -106,20 +134,35 @@ typedef enum {
  * the vehicle's control states and commands.
  */
 typedef struct {
-    uint16_t speed;             /**< Speed command */
-    uint16_t braking;           /**< Braking command */
-    int16_t steering;           /**< Steering command */
-    uint8_t gear_shift;      /**< Gear shift command */
-    uint8_t mode_selection;  /**< Mode selection command */
-    bool8u EBP;                /**< Electronic Parking Brake status */
-    bool8u front_light;        /**< Front light status */
-    bool8u left_light;         /**< Left light status */
-    bool8u right_light;        /**< Right light status */
-    bool8u speed_mode;         /**< Speed mode status */
-    bool8u state_control;      /**< State control status */
-    bool8u advanced_mode;      /**< Advanced mode status */
-    bool8u self_driving;       /**< Self-driving mode status */
+	uint16_t speed; /**< Speed command */
+	uint16_t braking; /**< Braking command */
+	int16_t steering; /**< Steering command */
+	uint8_t gear_shift; /**< Gear shift command */
+	uint8_t mode_selection; /**< Mode selection command */
+	bool8u EBP; /**< Electronic Parking Brake status */
+	bool8u front_light; /**< Front light status */
+	bool8u left_light; /**< Left light status */
+	bool8u right_light; /**< Right light status */
+	bool8u speed_mode; /**< Speed mode status */
+	bool8u state_control; /**< State control status */
+	bool8u advanced_mode; /**< Advanced mode status */
+	bool8u self_driving; /**< Self-driving mode status */
 } auto_control_data_t;
+
+typedef struct {
+	int16_t speed;
+	int16_t steer;
+	uint16_t braking;
+	uint8_t gear :2;
+	uint8_t mode :2;
+	uint8_t l_steer_light :1;
+	uint8_t r_steer_light :1;
+	uint8_t tail_light :1;
+	uint8_t braking_light :1;
+	uint8_t vehicle_status :1;
+	uint8_t vehicle_mode :1;
+	uint8_t emergency_stop :1;
+} auto_data_feedback_t;
 
 /**
  * @brief Structure representing an Auto Control instance
@@ -127,9 +170,10 @@ typedef struct {
  * This structure represents an instance of the Auto Control module.
  */
 typedef struct {
-    auto_control_data_t auto_control_data; /**< Auto Control data */
-    t818_driving_commands_t *driving_commands; /**< Pointer to driving commands */
-    auto_control_state state; /**< Current state of the Auto Control */
+	auto_data_feedback_t auto_data_feedback;
+	auto_control_data_t auto_control_data; /**< Auto Control data */
+	t818_driving_commands_t *driving_commands; /**< Pointer to driving commands */
+	auto_control_state state; /**< Current state of the Auto Control */
 } auto_control_t;
 
 /* Function Prototypes ------------------------------------------------------*/
@@ -143,7 +187,8 @@ typedef struct {
  * @param driving_commands Pointer to the driving commands structure.
  * @return AUTO_CONTROL_OK if initialization was successful, otherwise AUTO_CONTROL_ERROR.
  */
-AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control, t818_driving_commands_t *driving_commands);
+AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
+		t818_driving_commands_t *driving_commands);
 
 /**
  * @brief Performs a control step in the Auto Control module

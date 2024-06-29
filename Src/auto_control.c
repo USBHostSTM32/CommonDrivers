@@ -13,26 +13,12 @@
 
 #include "auto_control.h"
 
-/**
- * @brief Checks if the conditions for enabling parking are met.
- *
- * This inline function checks if the conditions for enabling parking are met
- * based on the provided speed and brake commands. It returns `CD_TRUE` if the
- * speed command is below or equal to the speed threshold and the brake command
- * is above the braking threshold, indicating that the vehicle can transition
- * to the PARKING state.
- *
- * @param speed_cmd The current speed command.
- * @param brake_cmd The current brake command.
- * @return `CD_TRUE` if parking conditions are met, otherwise `CD_FALSE`.
- */
-static inline bool8u __check_parking_enable(uint16_t speed_cmd,
-		uint16_t brake_cmd) {
-	static const uint16_t speed_threshold = 0U; /**< Threshold for speed command to enable parking */
-	static const uint16_t braking_threshold = T818_BRAKE_MAX / 2U; /**< Threshold for brake command to enable parking */
+
+static inline bool8u __check_parking_enable(int16_t speed_cmd) {
+	static const int16_t speed_threshold = 10U; /**< Threshold for speed command to enable parking */
 	bool8u ret = CD_FALSE;
 
-	if ((speed_cmd == speed_threshold) && (brake_cmd > braking_threshold)) {
+	if ((speed_cmd < speed_threshold) && (speed_cmd > (-1*speed_threshold))) {
 		ret = CD_TRUE;
 	}
 	return ret;
@@ -74,8 +60,6 @@ static inline auto_control_state __update_auto_control_state_parking(
 static inline auto_control_state __update_auto_control_state_retro(
 		auto_control_t *auto_control) {
 	auto_control_state new_state;
-	const auto_control_data_t *auto_data =
-			(auto_control_data_t*) &(auto_control->auto_control_data);
 	if ((auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state
 			== BUTTON_PRESSED)
 			|| (auto_control->driving_commands->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
@@ -85,7 +69,7 @@ static inline auto_control_state __update_auto_control_state_retro(
 			== BUTTON_PRESSED)
 			|| (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
 					== BUTTON_PRESSED))
-			&& (__check_parking_enable(auto_data->speed, auto_data->braking)
+			&& (__check_parking_enable(auto_control->auto_data_feedback.speed)
 					== CD_TRUE)) {
 		new_state = PARKING;
 	} else {
@@ -106,8 +90,6 @@ static inline auto_control_state __update_auto_control_state_retro(
 static inline auto_control_state __update_auto_control_state_neutral(
 		auto_control_t *auto_control) {
 	auto_control_state new_state;
-	const auto_control_data_t *auto_data =
-			(auto_control_data_t*) &(auto_control->auto_control_data);
 	if (auto_control->driving_commands->buttons[AUTO_CONTROL_GEAR_UP_BUTTON].state
 			== BUTTON_PRESSED) {
 		new_state = DRIVE;
@@ -116,7 +98,7 @@ static inline auto_control_state __update_auto_control_state_neutral(
 		new_state = RETRO;
 	} else if ((auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
 			== BUTTON_PRESSED)
-			&& (__check_parking_enable(auto_data->speed, auto_data->braking)
+			&& (__check_parking_enable(auto_control->auto_data_feedback.speed)
 					== CD_TRUE)) {
 		new_state = PARKING;
 	} else {
@@ -136,8 +118,6 @@ static inline auto_control_state __update_auto_control_state_neutral(
  */
 static inline auto_control_state __update_auto_control_state_drive(
 		auto_control_t *auto_control) {
-	const auto_control_data_t *auto_data =
-			(auto_control_data_t*) &(auto_control->auto_control_data);
 	const t818_driving_commands_t *drive_comm =
 			(t818_driving_commands_t*) auto_control->driving_commands;
 	auto_control_state new_state;
@@ -146,7 +126,7 @@ static inline auto_control_state __update_auto_control_state_drive(
 			|| (drive_comm->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
 					== BUTTON_PRESSED)) {
 		new_state = NEUTRAL;
-	} else if ((__check_parking_enable(auto_data->speed, auto_data->braking)
+	} else if ((__check_parking_enable(auto_control->auto_data_feedback.speed)
 			== CD_TRUE)
 			&& drive_comm->buttons[AUTO_CONTROL_PARKING_BUTTON].state
 					== BUTTON_PRESSED) {
@@ -284,27 +264,51 @@ static inline void __drive_rules(auto_control_t *auto_control) {
 	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
 }
 
+static inline void __auto_control_data_init(
+		auto_control_data_t *auto_control_data) {
+	auto_control_data->self_driving = CD_FALSE;
+	auto_control_data->advanced_mode = CD_FALSE;
+	auto_control_data->state_control = CD_FALSE;
+	auto_control_data->speed_mode = CD_FALSE;
+	auto_control_data->right_light = CD_FALSE;
+	auto_control_data->left_light = CD_FALSE;
+	auto_control_data->front_light = CD_FALSE;
+	auto_control_data->EBP = CD_TRUE;
+	auto_control_data->mode_selection =
+	AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+	auto_control_data->gear_shift =
+	AUTO_CONTROL_GEAR_SHIFT_PARK;
+	auto_control_data->steering = 0;
+	auto_control_data->braking = AUTO_CONTROL_MAX_BRAKING;
+	auto_control_data->speed = AUTO_CONTROL_MIN_SPEED;
+}
+
+static inline void __auto_data_feedback_init(
+		auto_data_feedback_t *auto_data_feedback) {
+	auto_data_feedback->speed = AUTO_DATA_FEEDBACK_SPEED_ZERO;
+	auto_data_feedback->steer = AUTO_DATA_FEEDBACK_STEER_ZERO;
+	auto_data_feedback->braking = AUTO_DATA_FEEDBACK_BRAKING_MIN;
+	auto_data_feedback->gear = AUTO_DATA_FEEDBACK_GEAR_PARK;
+	auto_data_feedback->mode = AUTO_DATA_FEEDBACK_MODE_FRONT_AND_REAR;
+	auto_data_feedback->l_steer_light = CD_FALSE;
+	auto_data_feedback->r_steer_light = CD_FALSE;
+	auto_data_feedback->tail_light = CD_FALSE;
+	auto_data_feedback->braking_light = CD_FALSE;
+	auto_data_feedback->vehicle_status =
+			AUTO_DATA_FEEDBACK_VEICHLE_STATUS_NORMAL;
+	auto_data_feedback->vehicle_mode =
+			AUTO_DATA_FEEDBACK_VEICHLE_MODE_AUTONOMOUS_DRIVING;
+	auto_data_feedback->emergency_stop = CD_TRUE;
+}
+
 AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
 		t818_driving_commands_t *driving_commands) {
 	AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
 
 	if ((auto_control != NULL) && (driving_commands != NULL)) {
 		auto_control->driving_commands = driving_commands;
-		auto_control->auto_control_data.self_driving = CD_FALSE;
-		auto_control->auto_control_data.advanced_mode = CD_FALSE;
-		auto_control->auto_control_data.state_control = CD_FALSE;
-		auto_control->auto_control_data.speed_mode = CD_FALSE;
-		auto_control->auto_control_data.right_light = CD_FALSE;
-		auto_control->auto_control_data.left_light = CD_FALSE;
-		auto_control->auto_control_data.front_light = CD_FALSE;
-		auto_control->auto_control_data.EBP = CD_TRUE;
-		auto_control->auto_control_data.mode_selection =
-		AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
-		auto_control->auto_control_data.gear_shift =
-		AUTO_CONTROL_GEAR_SHIFT_PARK;
-		auto_control->auto_control_data.steering = 0;
-		auto_control->auto_control_data.braking = AUTO_CONTROL_MAX_BRAKING;
-		auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
+		__auto_control_data_init(&auto_control->auto_control_data);
+		__auto_data_feedback_init(&auto_control->auto_data_feedback);
 		auto_control->state = PARKING;
 
 		status = AUTO_CONTROL_OK;
