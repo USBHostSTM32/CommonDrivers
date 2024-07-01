@@ -28,6 +28,16 @@
  */
 typedef uint8_t CanManager_StatusTypeDef;
 
+/* Constant Definitions ---------------------------------------------------------*/
+/**
+ * @brief Size of the CAN manager transmission data buffer.
+ */
+#define CAN_MANAGER_TX_DATA_SIZE (8U)
+/**
+ * @brief Size of the CAN manager reception data buffer.
+ */
+#define CAN_MANAGER_RX_DATA_SIZE (8U)
+
 /* Data Structure Definitions -----------------------------------------------*/
 /**
  * @brief Configuration structure for CAN Manager.
@@ -35,10 +45,10 @@ typedef uint8_t CanManager_StatusTypeDef;
  * This structure contains the configuration parameters required by the CAN Manager.
  */
 typedef struct {
-    CAN_HandleTypeDef *hcan;                         /**< Pointer to the CAN handle */
-    const CAN_TxHeaderTypeDef auto_control_tx_header; /**< Header for auto control transmission */
-    uint32_t auto_data_feedback_rx_fifo;             /**< FIFO for auto data feedback reception */
-    uint32_t auto_data_feedback_rx_interrupt;        /**< Interrupt for auto data feedback reception */
+	CAN_HandleTypeDef *hcan; /**< Pointer to the CAN handle */
+	const CAN_TxHeaderTypeDef auto_control_tx_header; /**< Header for auto control transmission */
+	uint32_t auto_data_feedback_rx_fifo; /**< FIFO for auto data feedback reception */
+	uint32_t auto_data_feedback_rx_interrupt; /**< Interrupt for auto data feedback reception */
 } can_manager_config_t;
 
 /**
@@ -48,8 +58,11 @@ typedef struct {
  */
 typedef struct {
     can_manager_config_t const *config; /**< Pointer to the CAN Manager configuration */
-    uint32_t auto_control_tx_mailbox;                /**< Mailbox for auto control transmission */
-    uint8_t n_tries;                   /**< Number of transmission tries */
+    uint32_t auto_control_tx_mailbox;   /**< Mailbox for auto control transmission */
+    uint8_t n_tries;                    /**< Number of transmission tries */
+    CAN_RxHeaderTypeDef RxHeader;       /**< CAN receive header */
+    uint8_t tx_data[CAN_MANAGER_TX_DATA_SIZE]; /**< Transmission data buffer */
+    uint8_t rx_data[CAN_MANAGER_RX_DATA_SIZE]; /**< Reception data buffer */
 } can_manager_t;
 
 /* Defines ------------------------------------------------------------------*/
@@ -89,7 +102,8 @@ typedef struct {
  * @param config Pointer to the configuration structure.
  * @return CAN_MANAGER_OK if initialization was successful, otherwise CAN_MANAGER_ERROR.
  */
-CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager, const can_manager_config_t* config);
+CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager,
+		const can_manager_config_t *config);
 
 /**
  * @brief Transmits Auto Control data.
@@ -102,6 +116,7 @@ CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager, const can_
  * @param can_data Pointer to the data to be transmitted.
  * @return CAN_MANAGER_OK if transmission was successful, otherwise CAN_MANAGER_ERROR.
  */
-CanManager_StatusTypeDef can_manager_auto_control_tx(can_manager_t *can_manager, const uint8_t *can_data);
+CanManager_StatusTypeDef can_manager_auto_control_tx(can_manager_t *can_manager,
+		const uint8_t *can_data);
 
 #endif /* INC_CAN_MANAGER_H_ */

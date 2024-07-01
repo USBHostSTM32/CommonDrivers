@@ -184,6 +184,17 @@ typedef uint8_t CanParser_StatusTypeDef;
  */
 CanParser_StatusTypeDef can_parser_from_auto_control_to_array(auto_control_data_t auto_control_data, uint8_t* data);
 
-CanParser_StatusTypeDef can_parser_from_array_to_auto_control_feedback(uint8_t* data,auto_data_feedback_t *auto_data_feedback);
+/**
+ * @brief Converts CAN frame payload to Auto Control Feedback data.
+ *
+ * This function translates an array of 8 `uint8_t` elements, representing
+ * the payload of a received CAN frame, into logical values in the
+ * `auto_data_feedback_t` structure.
+ *
+ * @param data Pointer to the array containing the CAN frame payload.
+ * @param auto_data_feedback Pointer to the structure where the Auto Control Feedback data will be stored.
+ * @return CAN_PARSER_OK if the conversion was successful, otherwise CAN_PARSER_ERROR.
+ */
+CanParser_StatusTypeDef can_parser_from_array_to_auto_control_feedback(uint8_t* data, auto_data_feedback_t *auto_data_feedback);
 
 #endif /* INC_CAN_PARSER_H_ */

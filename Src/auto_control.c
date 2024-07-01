@@ -13,7 +13,16 @@
 
 #include "auto_control.h"
 
-
+/**
+ * @brief Checks if parking is enabled based on speed command.
+ *
+ * This function checks whether parking is enabled based on the provided speed command.
+ * Parking is considered enabled if the absolute value of the speed command is less than
+ * a predefined threshold (`speed_threshold`).
+ *
+ * @param speed_cmd The speed command to be checked.
+ * @return CD_TRUE if parking is enabled, CD_FALSE otherwise.
+ */
 static inline bool8u __check_parking_enable(int16_t speed_cmd) {
 	static const int16_t speed_threshold = 10U; /**< Threshold for speed command to enable parking */
 	bool8u ret = CD_FALSE;
@@ -264,6 +273,14 @@ static inline void __drive_rules(auto_control_t *auto_control) {
 	auto_control->auto_control_data.gear_shift = AUTO_CONTROL_GEAR_SHIFT_DRIVE;
 }
 
+/**
+ * @brief Initializes auto control data structure with default values.
+ *
+ * This function initializes the fields of the `auto_control_data_t` structure
+ * with default values.
+ *
+ * @param auto_control_data Pointer to the auto control data structure to initialize.
+ */
 static inline void __auto_control_data_init(
 		auto_control_data_t *auto_control_data) {
 	auto_control_data->self_driving = CD_FALSE;
@@ -283,6 +300,14 @@ static inline void __auto_control_data_init(
 	auto_control_data->speed = AUTO_CONTROL_MIN_SPEED;
 }
 
+/**
+ * @brief Initializes auto data feedback structure with default values.
+ *
+ * This function initializes the fields of the `auto_data_feedback_t` structure
+ * with default values.
+ *
+ * @param auto_data_feedback Pointer to the auto data feedback structure to initialize.
+ */
 static inline void __auto_data_feedback_init(
 		auto_data_feedback_t *auto_data_feedback) {
 	auto_data_feedback->speed = AUTO_DATA_FEEDBACK_SPEED_ZERO;

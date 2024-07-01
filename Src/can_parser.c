@@ -74,14 +74,36 @@ CanParser_StatusTypeDef can_parser_from_auto_control_to_array(auto_control_data_
 }
 
 
-static inline uint8_t __fit_bits_into_struct(uint8_t* data,uint8_t position,uint8_t shift,uint8_t mask)
-{
-	return (data[position]&mask)>>shift;
+/**
+ * @brief Fits a specific set of bits from data into a structure.
+ *
+ * This function extracts a specific set of bits from the data array at the specified
+ * position, shifts them according to the shift parameter, and applies a mask to isolate
+ * the desired bits.
+ *
+ * @param data Pointer to the data array.
+ * @param position Index in the data array where the bits are located.
+ * @param shift Number of bit positions to shift right after extraction.
+ * @param mask Mask to apply to isolate the desired bits.
+ * @return Extracted and shifted bits as an unsigned 8-bit integer.
+ */
+static inline uint8_t __fit_bits_into_struct(uint8_t* data, uint8_t position, uint8_t shift, uint8_t mask) {
+    return (data[position] & mask) >> shift;
 }
 
-static inline int16_t __fit_bytes_into_struct(uint8_t* data,uint8_t position)
-{
-	return ((int16_t)(data[position])) | ((int16_t)(data[position+1U]<<(uint16_t)8U));
+/**
+ * @brief Fits two bytes from data into a signed 16-bit integer.
+ *
+ * This function combines two consecutive bytes from the data array starting at the specified
+ * position into a signed 16-bit integer. The first byte is treated as the least significant
+ * byte (LSB), and the second byte as the most significant byte (MSB).
+ *
+ * @param data Pointer to the data array.
+ * @param position Index in the data array where the LSB of the integer is located.
+ * @return Combined bytes as a signed 16-bit integer.
+ */
+static inline int16_t __fit_bytes_into_struct(uint8_t* data, uint8_t position) {
+    return ((int16_t)(data[position])) | ((int16_t)(data[position + 1U] << 8U));
 }
 
 CanParser_StatusTypeDef can_parser_from_array_to_auto_control_feedback(uint8_t* data,auto_data_feedback_t *auto_data_feedback)

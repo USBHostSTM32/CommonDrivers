@@ -54,6 +54,11 @@ typedef enum {
     DIRECTION_DOWN_RIGHT = 3
 } DirectionalPadArrowPosition;
 
+/**
+ * @brief Enumeration of drive control states.
+ *
+ * This enumeration defines the possible states for the drive control.
+ */
 typedef enum {
    WAITING_WHEEL_COFIGURATION,
    READING_WHEEL
@@ -86,7 +91,7 @@ typedef struct {
     HID_T818_Info_TypeDef *t818_info; /**< Pointer to the T818 info structure */
     const t818_drive_control_config_t *config; /**< Pointer to the configuration structure */
     t818_driving_commands_t t818_driving_commands; /**< Current driving commands */
-    t818_drive_control_state state;
+    t818_drive_control_state state; /**< current drive control state */
 } t818_drive_control_t;
 
 /* Defines ------------------------------------------------------------------*/
@@ -100,17 +105,35 @@ typedef struct {
  */
 #define T818_DC_ERROR     			 ((T818DriveControl_StatusTypeDef) 1U)
 
-#define T818_PEDAL_INCREMENT			(0.01f)
+/**
+ * @brief Pedal increment value.
+ */
+#define T818_PEDAL_INCREMENT (0.01f)
 
-#define T818_PEDAL_DECREMENT			(0.01f)
+/**
+ * @brief Pedal decrement value.
+ */
+#define T818_PEDAL_DECREMENT (0.01f)
 
-#define T818_BRAKING_SET_POINT			(1.0f)
+/**
+ * @brief Braking set point value.
+ */
+#define T818_BRAKING_SET_POINT (1.0f)
 
-#define T818_THROTTLING_SET_POINT		(0.0f)
+/**
+ * @brief Throttling set point value.
+ */
+#define T818_THROTTLING_SET_POINT (0.0f)
 
-#define T818_MAX_STEERING_ANGLE			(30.0f)
+/**
+ * @brief Maximum steering angle value.
+ */
+#define T818_MAX_STEERING_ANGLE (30.0f)
 
-#define T818_MIN_STEERING_ANGLE			(-30.0f)
+/**
+ * @brief Minimum steering angle value.
+ */
+#define T818_MIN_STEERING_ANGLE (-30.0f)
 
 
 /* Function Prototypes ------------------------------------------------------*/
@@ -127,7 +150,15 @@ T818DriveControl_StatusTypeDef t818_drive_control_init(
     const t818_drive_control_config_t *t818_config,
     HID_T818_Info_TypeDef *t818_info);
 
-T818DriveControl_StatusTypeDef t818_drive_control_step(
-    t818_drive_control_t *t818_drive_control);
+/**
+ * @brief Executes a single step of the drive control logic.
+ *
+ * This function performs one iteration of the drive control logic for the provided
+ * `t818_drive_control_t` instance.
+ *
+ * @param t818_drive_control Pointer to the drive control instance.
+ * @return T818_DC_OK if the step was executed successfully, otherwise T818_DC_ERROR.
+ */
+T818DriveControl_StatusTypeDef t818_drive_control_step(t818_drive_control_t *t818_drive_control);
 
 #endif /* INC_T818_DRIVE_CONTROL_H_ */
