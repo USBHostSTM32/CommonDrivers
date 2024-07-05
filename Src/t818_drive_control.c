@@ -175,7 +175,8 @@ static inline bool8u __check_wheel_is_linked(
 	if (t818_drive_control->config->t818_host_handle->pActiveClass != NULL) {
 		const HID_HandleTypeDef *active_class =
 				(HID_HandleTypeDef*) t818_drive_control->config->t818_host_handle->pActiveClass->pData;
-		if ((active_class->state == USBH_HID_POLL) || (active_class->state== USBH_HID_GET_DATA)) {
+		if ((active_class->state == USBH_HID_POLL)
+				|| (active_class->state == USBH_HID_GET_DATA)) {
 			wheel_linked = CD_TRUE;
 		}
 	}
@@ -248,7 +249,6 @@ static inline float __calculate_new_smoothed_value(float current_value,
 	}
 	return (float) new_smoothed;
 }
-//---------------
 
 T818DriveControl_StatusTypeDef t818_drive_control_step(
 		t818_drive_control_t *t818_drive_control) {
