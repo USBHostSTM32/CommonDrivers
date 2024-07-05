@@ -335,7 +335,7 @@ static USBH_StatusTypeDef USBH_HID_ClassRequest(USBH_HandleTypeDef *phost) {
 		if (t818_ff_manager_init(phost) == T818_FF_MANAGER_OK) {
 			classReqStatus = USBH_OK;
 		} else {
-			classReqStatus = USBH_FAIL;
+			classReqStatus = USBH_NOT_SUPPORTED;
 		}
 
 		if (classReqStatus == USBH_OK) {
