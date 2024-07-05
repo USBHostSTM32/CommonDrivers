@@ -180,6 +180,23 @@ static inline void __basic_rules(auto_control_t *auto_control) {
 			AUTO_CONTROL_MAX_STEERING));
 }
 
+/*
+ * @brief
+ */
+static inline uint16_t __calculate_speed(float throttling_module){
+	return (uint16_t) roundf(throttling_module * ((float) AUTO_CONTROL_MAX_SPEED));
+}
+
+
+/*
+ * @brief
+ */
+static inline uint16_t __calculate_braking(float braking_module){
+	return (uint16_t) roundf(braking_module * ((float) AUTO_CONTROL_MAX_BRAKING));
+}
+
+
+
 /**
  * @brief Applies the moving rules for the Auto Control module.
  *
@@ -189,20 +206,14 @@ static inline void __basic_rules(auto_control_t *auto_control) {
  * @param auto_control Pointer to the Auto Control instance.
  */
 static inline void __moving_rules(auto_control_t *auto_control) {
-	uint16_t braking;
+	uint16_t braking = __calculate_braking(auto_control->driving_commands->braking_module);
 	uint16_t speed;
 	auto_control->auto_control_data.EBP = CD_FALSE;
-	braking = (uint16_t) roundf(
-			auto_control->driving_commands->braking_module
-					* ((float) AUTO_CONTROL_MAX_BRAKING));
-	speed = (uint16_t) roundf(
-			auto_control->driving_commands->throttling_module
-					* ((float) AUTO_CONTROL_MAX_SPEED));
 
-	if ((braking > AUTO_CONTROL_MIN_BRAKING)
-			&& (speed > AUTO_CONTROL_MIN_SPEED)) {
-		braking = AUTO_CONTROL_MAX_BRAKING;
-		speed = AUTO_CONTROL_MIN_SPEED;
+	if (braking > AUTO_CONTROL_MIN_BRAKING) {
+			speed = AUTO_CONTROL_MIN_SPEED;
+	} else {
+		speed = __calculate_speed(auto_control->driving_commands->throttling_module);
 	}
 
 	auto_control->auto_control_data.braking = braking;
@@ -222,10 +233,7 @@ static inline void __neutral_rules(auto_control_t *auto_control) {
 	auto_control->auto_control_data.EBP = CD_FALSE;
 	auto_control->auto_control_data.gear_shift =
 	AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-	auto_control->auto_control_data.braking = (uint16_t) roundf(
-			auto_control->driving_commands->braking_module
-					* ((float) AUTO_CONTROL_MAX_BRAKING));
-	auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
+	auto_control->auto_control_data.braking = __calculate_braking(auto_control->driving_commands->braking_module);
 }
 
 /**
