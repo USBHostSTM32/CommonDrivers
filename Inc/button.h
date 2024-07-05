@@ -65,6 +65,7 @@ typedef enum {
     STATE_CHANGED /**< Button state has changed */
 } button_long_pressed_enum;
 
+/* Data Structure Definitions -----------------------------------------------*/
 /**
  * @brief Button structure definition.
  *
@@ -86,9 +87,9 @@ typedef Button_StatusTypeDef (*is_pressed_func)(button_t *button);
  */
 struct button_s {
     is_pressed_func is_pressed; /**< Function pointer for checking if the button is pressed */
-    uint8_t actual_raw_state :1; /**< Current raw state of the button */
-    uint8_t previous_raw_state :1; /**< Previous raw state of the button */
-    uint8_t state :1; /**< Current state of the button */
+    uint8_t actual_raw_state; /**< Current raw state of the button */
+    uint8_t previous_raw_state; /**< Previous raw state of the button */
+    uint8_t state; /**< Current state of the button */
     button_long_pressed_enum long_pressed_state; /**< Long press state of the button */
     uint32_t start_pressing_time; /**< Time when the button was first pressed */
 };
@@ -162,21 +163,5 @@ Button_StatusTypeDef button_init(button_t *button, is_pressed_func function);
  * @return Button_StatusTypeDef Status of the update process.
  */
 Button_StatusTypeDef button_update(button_t *button, uint8_t new_raw_state);
-
-/**
- * @brief Retrieves the current state of the button.
- *
- * @param button Pointer to the button structure.
- * @param state Pointer to store the current state of the button.
- * @return Button_StatusTypeDef Status of the retrieval process.
- */
-inline Button_StatusTypeDef button_get_state(button_t *button, uint8_t *state) {
-    Button_StatusTypeDef status = BUTTON_ERROR;
-    if ((button != NULL) && (state != NULL)) {
-        *state = button->state;
-        status = BUTTON_OK;
-    }
-    return status;
-}
 
 #endif /* INC_BUTTON_H_ */

@@ -15,6 +15,26 @@
 #include "stdint.h"
 
 /**
+ * @brief Unsigned 8-bit boolean type.
+ *
+ * This typedef defines an unsigned 8-bit integer to be used as a boolean type.
+ */
+typedef uint8_t bool8u;
+
+/**
+ * @brief Boolean true value.
+ *
+ * This macro defines the true value for the `bool8u` type.
+ */
+#define CD_TRUE ((bool8u) 1U)
+/**
+ * @brief Boolean false value.
+ *
+ * This macro defines the false value for the `bool8u` type.
+ */
+#define CD_FALSE ((bool8u) 0U)
+
+/**
  * Clamps a float value to a specified range.
  *
  * @param[in] x The value to clamp.

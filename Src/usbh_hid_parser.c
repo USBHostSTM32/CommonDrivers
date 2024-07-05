@@ -125,8 +125,11 @@ uint32_t HID_ReadItem(HID_Report_ItemTypedef *ri, uint8_t ndx)
   /* read data bytes in little endian order */
   for (x = 0U; x < (((ri->size & 0x7U) != 0U) ? ((ri->size / 8U) + 1U) : (ri->size / 8U)); x++)
   {
-    //val = (uint32_t)((uint32_t)(*data) << (x * 8U));
-	  val |= (uint32_t)(data[x]) << (x * 8U);// LETTURA LITTLE ENDIAN SU PIU BYTE
+	  /*The code here is modified to manage the reading of more than 1 byte in little endian way.
+	   * Before the code only reads the first byte and ignores the others.
+	   */
+	//val = (uint32_t)((uint32_t)(*data) << (x * 8U));
+	  val |= (uint32_t)(data[x]) << (x * 8U);
   }
   val = (val >> shift) & (((uint32_t)1U << ri->size) - 1U);
 

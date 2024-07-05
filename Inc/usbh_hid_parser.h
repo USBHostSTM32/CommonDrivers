@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdint.h>
 #include "usbh_hid.h"
 #include "usbh_hid_usage.h"
 

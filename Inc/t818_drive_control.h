@@ -16,6 +16,9 @@
 #include <usbh_hid_t818.h>
 #include "button.h"
 #include "math.h"
+#include "common_drivers.h"
+#include "t818_ff_manager.h"
+
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
@@ -26,6 +29,7 @@
  */
 typedef uint8_t T818DriveControl_StatusTypeDef;
 
+/* Enumeration Definitions -----------------------------------------------*/
 /**
  * @brief T818 Drive Control Configuration Structure
  *
@@ -52,11 +56,17 @@ typedef enum {
     DIRECTION_DOWN_RIGHT = 3
 } DirectionalPadArrowPosition;
 
+/**
+ * @brief Enumeration of drive control states.
+ *
+ * This enumeration defines the possible states for the drive control.
+ */
 typedef enum {
    WAITING_WHEEL_COFIGURATION,
    READING_WHEEL
 } t818_drive_control_state;
 
+/* Data Structure Definitions -----------------------------------------------*/
 /**
  * @brief T818 Driving Commands Structure
  *
@@ -83,7 +93,7 @@ typedef struct {
     HID_T818_Info_TypeDef *t818_info; /**< Pointer to the T818 info structure */
     const t818_drive_control_config_t *config; /**< Pointer to the configuration structure */
     t818_driving_commands_t t818_driving_commands; /**< Current driving commands */
-    t818_drive_control_state state;
+    t818_drive_control_state state; /**< current drive control state */
 } t818_drive_control_t;
 
 /* Defines ------------------------------------------------------------------*/
@@ -97,20 +107,35 @@ typedef struct {
  */
 #define T818_DC_ERROR     			 ((T818DriveControl_StatusTypeDef) 1U)
 
+/**
+ * @brief Pedal increment value.
+ */
+#define T818_PEDAL_INCREMENT (0.01f)
 
-typedef uint8_t bool;
+/**
+ * @brief Pedal decrement value.
+ */
+#define T818_PEDAL_DECREMENT (0.01f)
 
-#define CD_TRUE							((bool) 1U)
-#define CD_FALSE						((bool) 0U)
+/**
+ * @brief Braking set point value.
+ */
+#define T818_BRAKING_SET_POINT (1.0f)
 
+/**
+ * @brief Throttling set point value.
+ */
+#define T818_THROTTLING_SET_POINT (0.0f)
 
-#define T818_PEDAL_INCREMENT			(0.01f)
+/**
+ * @brief Maximum steering angle value.
+ */
+#define T818_MAX_STEERING_ANGLE (30.0f)
 
-#define T818_PEDAL_DECREMENT			(0.01f)
-
-#define T818_BRAKING_SET_POINT			(1.0f)
-
-#define T818_THROTTLING_SET_POINT		(0.0f)
+/**
+ * @brief Minimum steering angle value.
+ */
+#define T818_MIN_STEERING_ANGLE (-30.0f)
 
 
 /* Function Prototypes ------------------------------------------------------*/
@@ -127,25 +152,15 @@ T818DriveControl_StatusTypeDef t818_drive_control_init(
     const t818_drive_control_config_t *t818_config,
     HID_T818_Info_TypeDef *t818_info);
 
-T818DriveControl_StatusTypeDef t818_drive_control_step(
-    t818_drive_control_t *t818_drive_control);
-
 /**
- * @brief Retrieves the current driving commands from the T818 Drive Control module.
+ * @brief Executes a single step of the drive control logic.
  *
- * @param t818_drive_control Pointer to the T818 Drive Control state structure.
- * @param t818_driving_commands Pointer to the structure to store the current driving commands.
- * @return T818DriveControl_StatusTypeDef Status of the retrieval process.
+ * This function performs one iteration of the drive control logic for the provided
+ * `t818_drive_control_t` instance.
+ *
+ * @param t818_drive_control Pointer to the drive control instance.
+ * @return T818_DC_OK if the step was executed successfully, otherwise T818_DC_ERROR.
  */
-inline T818DriveControl_StatusTypeDef t818_drive_control_get_driving_commands(
-    t818_drive_control_t *t818_drive_control,
-    t818_driving_commands_t *t818_driving_commands) {
-    T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
-    if ((t818_drive_control != NULL) && (t818_driving_commands != NULL)) {
-        *t818_driving_commands = t818_drive_control->t818_driving_commands;
-        status = T818_DC_OK;
-    }
-    return status;
-}
+T818DriveControl_StatusTypeDef t818_drive_control_step(t818_drive_control_t *t818_drive_control);
 
 #endif /* INC_T818_DRIVE_CONTROL_H_ */
