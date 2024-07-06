@@ -30,6 +30,7 @@ static inline uint8_t __stop_summation(double u, double e, double ukmax, double 
  * @param pid Pointer to the PID regulator structure.
  * @param kp Proportional gain.
  * @param ki Integral gain.
+ * @param kd Derivative gain.
  * @param ukmax Upper clamping limit.
  * @param ukmin Lower clamping limit.
  * @return PID_StatusTypeDef PID_OK if successful, PID_ERROR otherwise.
