@@ -8,12 +8,12 @@
 #include "rotation_manager.h"
 
 Rotation_Manager_StatusTypeDef rotation_manager_init(
-		rotation_manager_t *rotation_manager, pi_t *pi,
+		rotation_manager_t *rotation_manager, pid_t *pid,
 		USBH_HandleTypeDef *phost) {
 	Rotation_Manager_StatusTypeDef status = ROTATION_MANAGER_ERROR;
 
-	if ((rotation_manager != NULL) && (pi != NULL) && (phost != NULL)) {
-		rotation_manager->pi = pi;
+	if ((rotation_manager != NULL) && (pid != NULL) && (phost != NULL)) {
+		rotation_manager->pid = pid;
 		rotation_manager->phost = phost;
 		status = ROTATION_MANAGER_OK;
 	}
@@ -34,7 +34,7 @@ Rotation_Manager_StatusTypeDef rotation_manager_update(
 		e = (((double) auto_steer_feedback / 300.0) * 1024.0)
 				- (double) auto_control_steer;
 
-		if (calculate_output(rotation_manager->pi, e, &u) == PI_ERROR) {
+		if (pid_calculate_output(rotation_manager->pid, e, &u) == PID_ERROR) {
 			status = ROTATION_MANAGER_ERROR;
 		}
 
