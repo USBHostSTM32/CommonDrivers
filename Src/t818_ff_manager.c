@@ -30,7 +30,7 @@
 /** @brief Size of the packets sent to the device. */
 #define PACKET_SIZE                                         (64U)
 /** @brief Pipe index for force feedback management on the T818. */
-#define T818_FF_MANAGER_FF_PIPE								(0x03)
+#define FF_PIPE_INDEX       								(0x03)
 
 /** @brief Configuration packet 1 for initializing the T818. */
 static const uint8_t configuration_pack1[PACKET_SIZE] = {
@@ -141,16 +141,23 @@ static const uint8_t set_range[PACKET_SIZE] = {
 static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTypeDef *phost,
     uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    USBH_URBStateTypeDef urb_status = USBH_URB_ERROR;
     uint32_t stop_time = HAL_GetTick() + Timeout;
-    do {
+    USBH_URBStateTypeDef urb_status = USBH_LL_GetURBState(phost, pipe_index);
+    
+    while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time)){
         urb_status = USBH_LL_GetURBState(phost, pipe_index);
-    } while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time));
-
+    }
+   
     if ((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)) {
-        USBH_InterruptSendData(phost, buff, length, pipe_index);
-    	osDelay(T818_INTERRUPT_DELAY);
-		status = T818_FF_MANAGER_OK;
+        (void)USBH_InterruptSendData(phost, buff, length, pipe_index);
+        urb_status = USBH_LL_GetURBState(phost, pipe_index);
+        while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time)){
+            osDelay(T818_INTERRUPT_DELAY);
+            urb_status = USBH_LL_GetURBState(phost, pipe_index);
+        }
+        if((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)){
+            status = T818_FF_MANAGER_OK;
+        }
     }
 
     return status;
@@ -164,7 +171,7 @@ static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTyp
  * @return T818_FF_Manager_StatusTypeDef Status of the operation.
  */
 static inline T818_FF_Manager_StatusTypeDef __send_ff_packet(USBH_HandleTypeDef *phost, const uint8_t *buff) {
-    return __send_interrupt_data(phost, (uint8_t *)buff, PACKET_SIZE, T818_FF_MANAGER_FF_PIPE, T818_FF_MANAGER_MAX_DELAY);
+    return __send_interrupt_data(phost, (uint8_t *)buff, PACKET_SIZE, FF_PIPE_INDEX, T818_FF_MANAGER_MAX_DELAY);
 }
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_init(USBH_HandleTypeDef *phost) {
@@ -185,9 +192,10 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_set_gain(USBH_HandleTypeDef *phost
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
     if (phost != NULL) {
     	uint8_t tx_data[PACKET_SIZE];
-        memcpy(tx_data, (uint8_t*) gain_base, PACKET_SIZE);
-        tx_data[GAIN_INDEX] = value;
-        status = __send_ff_packet(phost, tx_data);
+       if(memcpy(tx_data, (uint8_t*) gain_base, PACKET_SIZE) == tx_data){
+            tx_data[GAIN_INDEX] = value;
+            status = __send_ff_packet(phost, tx_data);
+       }
     }
     return status;
 }
@@ -202,12 +210,12 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(USBH_HandleTypeDef *
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_costant(USBH_HandleTypeDef *phost, int16_t value) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint8_t tx_data[PACKET_SIZE];
     if (phost != NULL) {
+        uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, costant_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
             tx_data[COSTANT_LOW_VALUE_INDEX] = value & 0x00FF;
-            tx_data[COSTANT_HI_VALUE_INDEX] = (value >> 8) & ((int16_t) 0x00FF);
+            tx_data[COSTANT_HI_VALUE_INDEX] = (value >> 8) & (0x00FF);
             status = __send_ff_packet(phost, tx_data);
         }
     }
@@ -216,8 +224,8 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_costant(USBH_HandleTypeDef 
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_play_spring(USBH_HandleTypeDef *phost) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint8_t tx_data[PACKET_SIZE];
     if (phost != NULL) {
+        uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, play_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = SPRING_ID;
             status = __send_ff_packet(phost, tx_data);
@@ -228,8 +236,8 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_play_spring(USBH_HandleTypeDef *ph
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_play_costant(USBH_HandleTypeDef *phost) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint8_t tx_data[PACKET_SIZE];
     if (phost != NULL) {
+        uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, play_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
             status = __send_ff_packet(phost, tx_data);
@@ -240,8 +248,8 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_play_costant(USBH_HandleTypeDef *p
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_spring(USBH_HandleTypeDef *phost) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint8_t tx_data[PACKET_SIZE];
     if (phost != NULL) {
+        uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, stop_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = SPRING_ID;
             status = __send_ff_packet(phost, tx_data);
@@ -252,8 +260,8 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_spring(USBH_HandleTypeDef *ph
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_costant(USBH_HandleTypeDef *phost) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint8_t tx_data[PACKET_SIZE];
     if (phost != NULL) {
+        uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, stop_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
             status = __send_ff_packet(phost, tx_data);

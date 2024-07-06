@@ -14,9 +14,13 @@
 #ifndef INC_T818_FF_MANAGER_H_
 #define INC_T818_FF_MANAGER_H_
 
-#include "stdint.h"
-#include "stdio.h"
+
+#include <stdio.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "usbh_hid.h"
+#include "usbh_def.h"
 #include "common_drivers.h"
 
 /** @brief Status type definition for the T818 force feedback manager. */
