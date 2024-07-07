@@ -4,7 +4,7 @@
  * 
  * This file contains the declarations of functions and macros used for initializing
  * and controlling the force feedback effects on the T818 servo base. The driver
- * communicates with the device over USB, sending configuration and control packets
+ * communicates with the device over USB, sending interrupts packets
  * to manage effects like spring, constant force, and gain.
  * 
  * Created on: Jul 4, 2024

@@ -13,8 +13,8 @@
 
 typedef uint8_t Rotation_Manager_StatusTypeDef;
 
-#define ROTATION_MANAGER_OK       	((Rotation_Manager_StatusTypeDef) 0)
-#define ROTATION_MANAGER_ERROR    	((Rotation_Manager_StatusTypeDef) 1)
+#define ROTATION_MANAGER_OK       	((Rotation_Manager_StatusTypeDef) 0U)
+#define ROTATION_MANAGER_ERROR    	((Rotation_Manager_StatusTypeDef) 1U)
 
 typedef struct {
 	pid_t *pid;
