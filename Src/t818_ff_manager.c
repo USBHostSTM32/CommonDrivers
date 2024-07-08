@@ -94,14 +94,14 @@ static const uint8_t play_effect_base[PACKET_SIZE] = {
 
 /** @brief Base packet for the constant force effect on the T818. */
 static const uint8_t costant_base[PACKET_SIZE] = {
-    0x60, 0x00, 0x01, 0x6A, 0xFF, 0xF0, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF, 0xFF,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	0x60, 0x00, 0x01, 0x6A, 0xFF, 0xF0, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F,
+	0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
+	0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 /** @brief Packet for stopping the currently playing effect on the T818. */
@@ -138,29 +138,23 @@ static const uint8_t set_range[PACKET_SIZE] = {
  * @param Timeout Timeout duration for the operation.
  * @return T818_FF_Manager_StatusTypeDef Status of the operation.
  */
-static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTypeDef *phost,
-    uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout) {
-    T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint32_t stop_time = HAL_GetTick() + Timeout;
-    USBH_URBStateTypeDef urb_status = USBH_LL_GetURBState(phost, pipe_index);
-    
-    while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time)){
-        urb_status = USBH_LL_GetURBState(phost, pipe_index);
-    }
-   
-    if ((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)) {
-        (void)USBH_InterruptSendData(phost, buff, length, pipe_index);
-        urb_status = USBH_LL_GetURBState(phost, pipe_index);
-        while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time)){
-            osDelay(T818_INTERRUPT_DELAY);
-            urb_status = USBH_LL_GetURBState(phost, pipe_index);
-        }
-        if((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)){
-            status = T818_FF_MANAGER_OK;
-        }
-    }
+T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTypeDef *phost,
+		uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout) {
+	T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
+	USBH_URBStateTypeDef urb_status = USBH_URB_ERROR;
+	uint32_t stop_time = HAL_GetTick() + Timeout;
+	USBH_InterruptSendData(phost, buff, length, pipe_index);
+	osDelay(8);
+	do {
+		urb_status = USBH_LL_GetURBState(phost, pipe_index);
+	} while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE)
+			&& (HAL_GetTick() < stop_time));
 
-    return status;
+	if ((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)) {
+		status = T818_FF_MANAGER_OK;
+	}
+
+	return status;
 }
 
 /**
@@ -180,9 +174,9 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_init(USBH_HandleTypeDef *phost) {
         (__send_ff_packet(phost, configuration_pack1) == T818_FF_MANAGER_OK) &&
         (__send_ff_packet(phost, configuration_pack2) == T818_FF_MANAGER_OK) &&
         (__send_ff_packet(phost, set_range) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_set_gain(phost, 0xFF) == T818_FF_MANAGER_OK) &&
+        (t818_ff_manager_set_gain(phost, 0xFF) == T818_FF_MANAGER_OK)/* &&
         (t818_ff_manager_upload_spring(phost) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_play_spring(phost) == T818_FF_MANAGER_OK)) {
+        (t818_ff_manager_play_spring(phost) == T818_FF_MANAGER_OK)*/) {
         status = T818_FF_MANAGER_OK;
     }
     return status;

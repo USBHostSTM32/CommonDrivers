@@ -33,7 +33,7 @@ typedef uint8_t T818_FF_Manager_StatusTypeDef;
 #define T818_FF_MANAGER_ERROR 									((T818_FF_Manager_StatusTypeDef) 1U)
 
 /** @brief Maximum delay for T818 operations. */
-#define T818_FF_MANAGER_MAX_DELAY	1000U
+#define T818_FF_MANAGER_MAX_DELAY	100U
 
 /**
  * @brief Initializes the force feedback manager.

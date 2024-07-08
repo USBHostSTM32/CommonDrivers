@@ -32,14 +32,14 @@
 
 typedef uint8_t PID_StatusTypeDef;
 
-#define PID_OK       	((PID_StatusTypeDef) 0)
-#define PID_ERROR    	((PID_StatusTypeDef) 1)
+#define PID_OK       	((PID_StatusTypeDef) 0U)
+#define PID_ERROR    	((PID_StatusTypeDef) 1U)
 
 
 
-#define PID_KP			((double)5.50)
+#define PID_KP			((double)6.5)
 #define PID_KI			((double)0.00)
-#define PID_KD			((double)4000)
+#define PID_KD			((double)500)
 #define PID_MAX_U		((double)32766.0)
 #define PID_MIN_U		((double)-32767.0)
 
