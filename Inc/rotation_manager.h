@@ -18,11 +18,11 @@ typedef uint8_t Rotation_Manager_StatusTypeDef;
 
 typedef struct {
 	pid_t *pid;
-	USBH_HandleTypeDef *phost;
+	urb_sender_t *urb_sender;
 } rotation_manager_t;
 
 Rotation_Manager_StatusTypeDef rotation_manager_init(
-		rotation_manager_t *rotation_manager, pid_t *pid,USBH_HandleTypeDef *phost);
+		rotation_manager_t *rotation_manager, pid_t *pid,urb_sender_t *urb_sender);
 
 Rotation_Manager_StatusTypeDef rotation_manager_update(
 		rotation_manager_t *rotation_manager, int16_t auto_steer_feedback,

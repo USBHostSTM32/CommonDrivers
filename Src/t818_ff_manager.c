@@ -94,14 +94,14 @@ static const uint8_t play_effect_base[PACKET_SIZE] = {
 
 /** @brief Base packet for the constant force effect on the T818. */
 static const uint8_t costant_base[PACKET_SIZE] = {
-    0x60, 0x00, 0x01, 0x6A, 0xFF, 0xF0, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF, 0xFF,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	0x60, 0x00, 0x01, 0x6A, 0xFF, 0xF0, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F,
+	0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
+	0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 /** @brief Packet for stopping the currently playing effect on the T818. */
@@ -131,14 +131,15 @@ static const uint8_t set_range[PACKET_SIZE] = {
 /**
  * @brief Sends an interrupt data packet to the device.
  *
- * @param phost Pointer to the USB host handle.
+ * @param urb_sender Pointer to the USB host handle.
  * @param buff Pointer to the data buffer to be sent.
  * @param length Length of the data buffer.
  * @param pipe_index Index of the USB pipe to be used.
  * @param Timeout Timeout duration for the operation.
  * @return T818_FF_Manager_StatusTypeDef Status of the operation.
  */
-static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTypeDef *phost,
+/*
+static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTypeDef *urb_sender,
     uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
     uint32_t stop_time = HAL_GetTick() + Timeout;
@@ -162,109 +163,122 @@ static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTyp
 
     return status;
 }
+*/
+static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(urb_sender_t *urb_sender,
+    uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout){
+    T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
+    urb_interr_msg_t interr_msg;
+    interr_msg.pipe_num = pipe_index;
+    memcpy(interr_msg.msg, buff, length);
+    if(urb_sender_enqueue_msg(urb_sender, &interr_msg) == URB_SENDER_OK){
+    	status = T818_FF_MANAGER_OK;
+    }
+    return status;
 
+}
 /**
  * @brief Sends a force feedback packet to the device.
  *
- * @param phost Pointer to the USB host handle.
+ * @param urb_sender Pointer to the USB host handle.
  * @param buff Pointer to the data buffer to be sent.
  * @return T818_FF_Manager_StatusTypeDef Status of the operation.
  */
-static inline T818_FF_Manager_StatusTypeDef __send_ff_packet(USBH_HandleTypeDef *phost, const uint8_t *buff) {
-    return __send_interrupt_data(phost, (uint8_t *)buff, PACKET_SIZE, FF_PIPE_INDEX, T818_FF_MANAGER_MAX_DELAY);
+static inline T818_FF_Manager_StatusTypeDef __send_ff_packet(urb_sender_t *urb_sender, const uint8_t *buff) {
+    return __send_interrupt_data(urb_sender, (uint8_t *)buff, PACKET_SIZE, FF_PIPE_INDEX, T818_FF_MANAGER_MAX_DELAY);
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_init(USBH_HandleTypeDef *phost) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_init(urb_sender_t *urb_sender) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if ((phost != NULL) &&
-        (__send_ff_packet(phost, configuration_pack1) == T818_FF_MANAGER_OK) &&
-        (__send_ff_packet(phost, configuration_pack2) == T818_FF_MANAGER_OK) &&
-        (__send_ff_packet(phost, set_range) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_set_gain(phost, 0xFF) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_upload_spring(phost) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_play_spring(phost) == T818_FF_MANAGER_OK)) {
-        status = T818_FF_MANAGER_OK;
+    if ((urb_sender != NULL) &&
+        (__send_ff_packet(urb_sender, configuration_pack1) == T818_FF_MANAGER_OK) &&
+        (__send_ff_packet(urb_sender, configuration_pack2) == T818_FF_MANAGER_OK) &&
+        (__send_ff_packet(urb_sender, set_range) == T818_FF_MANAGER_OK) &&
+        (t818_ff_manager_set_gain(urb_sender, 0xFF) == T818_FF_MANAGER_OK) /*&&
+        (t818_ff_manager_upload_spring(urb_sender) == T818_FF_MANAGER_OK) &&
+        (t818_ff_manager_play_spring(urb_sender) == T818_FF_MANAGER_OK)*/) {
+
+    	status = T818_FF_MANAGER_OK;
     }
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_set_gain(USBH_HandleTypeDef *phost, uint8_t value) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_set_gain(urb_sender_t *urb_sender, uint8_t value) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if (phost != NULL) {
+    if (urb_sender != NULL) {
     	uint8_t tx_data[PACKET_SIZE];
        if(memcpy(tx_data, (uint8_t*) gain_base, PACKET_SIZE) == tx_data){
             tx_data[GAIN_INDEX] = value;
-            status = __send_ff_packet(phost, tx_data);
+            status = __send_ff_packet(urb_sender, tx_data);
        }
     }
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(USBH_HandleTypeDef *phost) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(urb_sender_t *urb_sender) {
 	T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if(phost != NULL){
-    	status = __send_ff_packet(phost, (uint8_t*) spring);
+    if(urb_sender != NULL){
+    	status = __send_ff_packet(urb_sender, (uint8_t*) spring);
     }
 	return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_costant(USBH_HandleTypeDef *phost, int16_t value) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_costant(urb_sender_t *urb_sender, int16_t value) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if (phost != NULL) {
+    if (urb_sender != NULL) {
         uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, costant_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
             tx_data[COSTANT_LOW_VALUE_INDEX] = value & 0x00FF;
             tx_data[COSTANT_HI_VALUE_INDEX] = (value >> 8) & (0x00FF);
-            status = __send_ff_packet(phost, tx_data);
+            status = __send_ff_packet(urb_sender, tx_data);
         }
     }
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_play_spring(USBH_HandleTypeDef *phost) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_play_spring(urb_sender_t *urb_sender) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if (phost != NULL) {
+    if (urb_sender != NULL) {
         uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, play_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = SPRING_ID;
-            status = __send_ff_packet(phost, tx_data);
+            status = __send_ff_packet(urb_sender, tx_data);
         }
     }
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_play_costant(USBH_HandleTypeDef *phost) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_play_costant(urb_sender_t *urb_sender) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if (phost != NULL) {
+    if (urb_sender != NULL) {
         uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, play_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
-            status = __send_ff_packet(phost, tx_data);
+            status = __send_ff_packet(urb_sender, tx_data);
         }
     }
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_spring(USBH_HandleTypeDef *phost) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_spring(urb_sender_t *urb_sender) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if (phost != NULL) {
+    if (urb_sender != NULL) {
         uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, stop_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = SPRING_ID;
-            status = __send_ff_packet(phost, tx_data);
+            status = __send_ff_packet(urb_sender, tx_data);
         }
     }
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_costant(USBH_HandleTypeDef *phost) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_stop_costant(urb_sender_t *urb_sender) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if (phost != NULL) {
+    if (urb_sender != NULL) {
         uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, stop_effect_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
-            status = __send_ff_packet(phost, tx_data);
+            status = __send_ff_packet(urb_sender, tx_data);
         }
     }
     return status;
