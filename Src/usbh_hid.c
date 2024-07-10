@@ -332,11 +332,13 @@ static USBH_StatusTypeDef USBH_HID_ClassRequest(USBH_HandleTypeDef *phost) {
 	case USBH_HID_REQ_SET_PROTOCOL:
 		/* set protocol */
 		//classReqStatus = USBH_HID_SetProtocol(phost, 1U);
+		/*
 		if (t818_ff_manager_init(phost) == T818_FF_MANAGER_OK) {
 			classReqStatus = USBH_OK;
 		} else {
 			classReqStatus = USBH_NOT_SUPPORTED;
 		}
+		*/
 
 		if (classReqStatus == USBH_OK) {
 			HID_Handle->ctl_state = USBH_HID_REQ_IDLE;
