@@ -13,6 +13,7 @@
 #define INC_COMMON_DRIVERS_H_
 
 #include "stdint.h"
+#include "math.h"
 
 /**
  * @brief Unsigned 8-bit boolean type.
@@ -58,6 +59,23 @@ float clamp_float(float x, float min, float max);
  * @return The mapped value.
  *
  */
-float map_value_float(float x, float in_min, float in_max, float out_min, float out_max);
+float map_value_float(float x, float in_min, float in_max, float out_min,
+		float out_max);
+
+/**
+ * @brief Calculates a new smoothed value.
+ *
+ * This function calculates a new smoothed value based on the current value,
+ * set point, maximum increment, and maximum decrement. It adjusts the current
+ * value towards the set point within the given constraints.
+ *
+ * @param[in] current_value The current value.
+ * @param[in] set_point The target value.
+ * @param[in] max_increment The maximum increment value.
+ * @param[in] max_decrement The maximum decrement value.
+ * @return The new smoothed value.
+ */
+float calculate_new_smoothed_value(float current_value, float set_point,
+		float max_increment, float max_decrement);
 
 #endif /* INC_COMMON_DRIVERS_H_ */

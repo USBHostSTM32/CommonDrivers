@@ -207,49 +207,6 @@ static inline bool8u __check_wheel_is_ready(
 	return wheel_ready;
 }
 
-/**
- * @brief Calculates a new smoothed value.
- *
- * This function calculates a new smoothed value based on the current value,
- * set point, maximum increment, and maximum decrement. It adjusts the current
- * value towards the set point within the given constraints.
- *
- * @param[in] current_value The current value.
- * @param[in] set_point The target value.
- * @param[in] max_increment The maximum increment value.
- * @param[in] max_decrement The maximum decrement value.
- * @return The new smoothed value.
- */
-static inline float __calculate_new_smoothed_value(float current_value,
-		float set_point, float max_increment, float max_decrement) {
-	float error = set_point - current_value;
-	float new_smoothed = 0.0f;
-	if (error != 0.0f) {
-		static const float positive_sign = 1.0f;
-		static const float negative_sign = -1.0f;
-		float error_sign = (error < 0.0f) ? negative_sign : positive_sign;
-		float adjustment = 0.0f;
-		if (((current_value > 0.0f) && (error < 0.0f))
-				|| ((current_value < 0.0f) && (error > 0.0f))) {
-			adjustment =
-					(fabs(current_value) <= max_decrement) ?
-							-current_value : (error_sign * max_decrement);
-		} else {
-			float abs_error = fabs(error);
-			adjustment = error_sign
-					* ((abs_error > max_increment) ? max_increment : abs_error);
-		}
-		new_smoothed = current_value + adjustment;
-		if (((adjustment > 0.0f) && (new_smoothed > set_point))
-				|| ((adjustment < 0.0f) && (new_smoothed < set_point))) {
-			new_smoothed = set_point;
-		}
-	} else {
-		new_smoothed = set_point;
-	}
-	return (float) new_smoothed;
-}
-
 T818DriveControl_StatusTypeDef t818_drive_control_step(
 		t818_drive_control_t *t818_drive_control) {
 	T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
@@ -260,7 +217,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 				t818_drive_control->state = READING_WHEEL;
 			} else {
 				t818_drive_control->t818_driving_commands.braking_module =
-						__calculate_new_smoothed_value(
+						calculate_new_smoothed_value(
 								t818_drive_control->t818_driving_commands.braking_module,
 								T818_BRAKING_SET_POINT, T818_PEDAL_INCREMENT,
 								T818_PEDAL_DECREMENT);

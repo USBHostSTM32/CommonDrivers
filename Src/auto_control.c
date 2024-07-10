@@ -183,8 +183,10 @@ static inline void __basic_rules(auto_control_t *auto_control) {
 /*
  * @brief
  */
-static inline uint16_t __calculate_speed(float throttling_module){
-	return (uint16_t) roundf(throttling_module * ((float) AUTO_CONTROL_MAX_SPEED));
+static inline uint16_t __calculate_speed(float current_speed, float set_point){
+	float speed=calculate_new_smoothed_value(current_speed, set_point*AUTO_CONTROL_MAX_SPEED,
+			AUTO_CONTROL_SPEED_MAX_INCREMENT, AUTO_CONTROL_SPEED_MAX_DECREMENT);
+	return (uint16_t) roundf(speed);
 }
 
 
@@ -213,7 +215,8 @@ static inline void __moving_rules(auto_control_t *auto_control) {
 	if (braking > AUTO_CONTROL_MIN_BRAKING) {
 			speed = AUTO_CONTROL_MIN_SPEED;
 	} else {
-		speed = __calculate_speed(auto_control->driving_commands->throttling_module);
+		float current_speed=(float)auto_control->auto_control_data.speed;
+		speed = __calculate_speed(current_speed,auto_control->driving_commands->throttling_module);
 	}
 
 	auto_control->auto_control_data.braking = braking;
