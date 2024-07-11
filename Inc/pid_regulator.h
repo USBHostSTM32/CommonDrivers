@@ -37,9 +37,9 @@ typedef uint8_t PID_StatusTypeDef;
 
 
 
-#define PID_KP			((double)6.5)
+#define PID_KP			((double)6.0)
 #define PID_KI			((double)0.00)
-#define PID_KD			((double)500)
+#define PID_KD			((double)40000)
 #define PID_MAX_U		((double)32766.0)
 #define PID_MIN_U		((double)-32767.0)
 

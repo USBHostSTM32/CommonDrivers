@@ -25,6 +25,13 @@
 #define COSTANT_LOW_VALUE_INDEX                             (4U)
 /** @brief Index for the high byte of the constant force value in the packet. */
 #define COSTANT_HI_VALUE_INDEX                              (5U)
+
+#define SPRING_FIRST_LOW_VALUE_INDEX                             (4U)
+#define SPRING_FIRST_HI_VALUE_INDEX                              (5U)
+
+#define SPRING_SECOND_LOW_VALUE_INDEX                             (6U)
+#define SPRING_SECOND_HI_VALUE_INDEX                              (7U)
+
 /** @brief Delay for USB interrupt operations. */
 #define T818_INTERRUPT_DELAY								(1U)
 /** @brief Size of the packets sent to the device. */
@@ -69,7 +76,7 @@ static const uint8_t gain_base[PACKET_SIZE] = {
 };
 
 /** @brief Packet for uploading the spring effect to the T818. */
-static const uint8_t spring[PACKET_SIZE] = {
+static const uint8_t spring_base[PACKET_SIZE] = {
     0x60, 0x00, 0x01, 0x64, 0x66, 0x26, 0x66, 0x26,
     0xff, 0xfe, 0xff, 0xfe, 0xa6, 0x6a, 0xa6, 0x6a,
     0xfe, 0xff, 0xfe, 0xff, 0xfe, 0xff, 0xfe, 0xff,
@@ -193,9 +200,9 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_init(urb_sender_t *urb_sender) {
         (__send_ff_packet(urb_sender, configuration_pack1) == T818_FF_MANAGER_OK) &&
         (__send_ff_packet(urb_sender, configuration_pack2) == T818_FF_MANAGER_OK) &&
         (__send_ff_packet(urb_sender, set_range) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_set_gain(urb_sender, 0xFF) == T818_FF_MANAGER_OK) /*&&
-        (t818_ff_manager_upload_spring(urb_sender) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_play_spring(urb_sender) == T818_FF_MANAGER_OK)*/) {
+        (t818_ff_manager_set_gain(urb_sender, 0xFF) == T818_FF_MANAGER_OK) &&
+        (t818_ff_manager_upload_spring(urb_sender,0x2666) == T818_FF_MANAGER_OK) &&
+        (t818_ff_manager_play_spring(urb_sender) == T818_FF_MANAGER_OK)) {
 
     	status = T818_FF_MANAGER_OK;
     }
@@ -214,12 +221,20 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_set_gain(urb_sender_t *urb_sender,
     return status;
 }
 
-T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(urb_sender_t *urb_sender) {
+T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(urb_sender_t *urb_sender, uint16_t value) {
 	T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    if(urb_sender != NULL){
-    	status = __send_ff_packet(urb_sender, (uint8_t*) spring);
-    }
-	return status;
+	    if (urb_sender != NULL) {
+	        uint8_t tx_data[PACKET_SIZE];
+	        if (memcpy(tx_data, spring_base, PACKET_SIZE) == tx_data) {
+	            tx_data[ID_INDEX] = SPRING_ID;
+	            tx_data[SPRING_FIRST_LOW_VALUE_INDEX] = value & 0x00FF;
+	            tx_data[SPRING_FIRST_HI_VALUE_INDEX] = (value >> 8) & (0x00FF);
+	            tx_data[SPRING_SECOND_LOW_VALUE_INDEX] = value & 0x00FF;
+				tx_data[SPRING_SECOND_HI_VALUE_INDEX] = (value >> 8) & (0x00FF);
+	            status = __send_ff_packet(urb_sender, tx_data);
+	        }
+	    }
+	    return status;
 }
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_costant(urb_sender_t *urb_sender, int16_t value) {

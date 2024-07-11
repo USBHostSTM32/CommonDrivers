@@ -58,9 +58,10 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_set_gain(urb_sender_t *urb_sender,
  * @brief Uploads the spring effect to the device.
  * 
  * @param phost Pointer to the USB host handle.
+ * @param value Value of the spring force to be set.
  * @return T818_FF_Manager_StatusTypeDef Status of the operation.
  */
-T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(urb_sender_t *urb_sender);
+T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(urb_sender_t *urb_sender, uint16_t value);
 
 /**
  * @brief Uploads the constant force effect to the device.
