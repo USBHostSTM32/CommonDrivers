@@ -27,7 +27,7 @@ static inline bool8u __check_parking_enable(int16_t speed_cmd) {
 	static const int16_t speed_threshold = 10U; /**< Threshold for speed command to enable parking */
 	bool8u ret = CD_FALSE;
 
-	if ((speed_cmd < speed_threshold) && (speed_cmd > (-1*speed_threshold))) {
+	if ((speed_cmd < speed_threshold) && (speed_cmd > (-1 * speed_threshold))) {
 		ret = CD_TRUE;
 	}
 	return ret;
@@ -171,7 +171,7 @@ static inline void __basic_rules(auto_control_t *auto_control) {
 	auto_data->front_light =
 			drive_comm->buttons[AUTO_CONTROL_FRONT_LIGHT_BUTTON].state;
 
-	auto_data->mode_selection = AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+	auto_data->mode_selection = AUTO_CONTROL_MODE_SELECTION_FIELD;
 
 	auto_data->steering = (int16_t) roundf(
 			map_value_float(drive_comm->wheel_steering_degree,
@@ -183,21 +183,20 @@ static inline void __basic_rules(auto_control_t *auto_control) {
 /*
  * @brief
  */
-static inline uint16_t __calculate_speed(float current_speed, float set_point){
-	float speed=calculate_new_smoothed_value(current_speed, set_point*AUTO_CONTROL_MAX_SPEED,
+static inline uint16_t __calculate_speed(float current_speed, float set_point) {
+	float speed = calculate_new_smoothed_value(current_speed,
+			set_point * AUTO_CONTROL_MAX_SPEED,
 			AUTO_CONTROL_SPEED_MAX_INCREMENT, AUTO_CONTROL_SPEED_MAX_DECREMENT);
 	return (uint16_t) roundf(speed);
 }
 
-
 /*
  * @brief
  */
-static inline uint16_t __calculate_braking(float braking_module){
-	return (uint16_t) roundf(braking_module * ((float) AUTO_CONTROL_MAX_BRAKING));
+static inline uint16_t __calculate_braking(float braking_module) {
+	return (uint16_t) roundf(
+			braking_module * ((float) AUTO_CONTROL_MAX_BRAKING));
 }
-
-
 
 /**
  * @brief Applies the moving rules for the Auto Control module.
@@ -208,15 +207,17 @@ static inline uint16_t __calculate_braking(float braking_module){
  * @param auto_control Pointer to the Auto Control instance.
  */
 static inline void __moving_rules(auto_control_t *auto_control) {
-	uint16_t braking = __calculate_braking(auto_control->driving_commands->braking_module);
+	uint16_t braking = __calculate_braking(
+			auto_control->driving_commands->braking_module);
 	uint16_t speed;
 	auto_control->auto_control_data.EBP = CD_FALSE;
 
 	if (braking > AUTO_CONTROL_MIN_BRAKING) {
-			speed = AUTO_CONTROL_MIN_SPEED;
+		speed = AUTO_CONTROL_MIN_SPEED;
 	} else {
-		float current_speed=(float)auto_control->auto_control_data.speed;
-		speed = __calculate_speed(current_speed,auto_control->driving_commands->throttling_module);
+		float current_speed = (float) auto_control->auto_control_data.speed;
+		speed = __calculate_speed(current_speed,
+				auto_control->driving_commands->throttling_module);
 	}
 
 	auto_control->auto_control_data.braking = braking;
@@ -236,7 +237,8 @@ static inline void __neutral_rules(auto_control_t *auto_control) {
 	auto_control->auto_control_data.EBP = CD_FALSE;
 	auto_control->auto_control_data.gear_shift =
 	AUTO_CONTROL_GEAR_SHIFT_NEUTRAL;
-	auto_control->auto_control_data.braking = __calculate_braking(auto_control->driving_commands->braking_module);
+	auto_control->auto_control_data.braking = __calculate_braking(
+			auto_control->driving_commands->braking_module);
 }
 
 /**
@@ -303,7 +305,7 @@ static inline void __auto_control_data_init(
 	auto_control_data->front_light = CD_FALSE;
 	auto_control_data->EBP = CD_TRUE;
 	auto_control_data->mode_selection =
-	AUTO_CONTROL_MODE_SELECTION_DIFFERENT;
+	AUTO_CONTROL_MODE_SELECTION_FIELD;
 	auto_control_data->gear_shift =
 	AUTO_CONTROL_GEAR_SHIFT_PARK;
 	auto_control_data->steering = 0;
@@ -331,9 +333,9 @@ static inline void __auto_data_feedback_init(
 	auto_data_feedback->tail_light = CD_FALSE;
 	auto_data_feedback->braking_light = CD_FALSE;
 	auto_data_feedback->vehicle_status =
-			AUTO_DATA_FEEDBACK_VEICHLE_STATUS_NORMAL;
+	AUTO_DATA_FEEDBACK_VEICHLE_STATUS_NORMAL;
 	auto_data_feedback->vehicle_mode =
-			AUTO_DATA_FEEDBACK_VEICHLE_MODE_AUTONOMOUS_DRIVING;
+	AUTO_DATA_FEEDBACK_VEICHLE_MODE_AUTONOMOUS_DRIVING;
 	auto_data_feedback->emergency_stop = CD_TRUE;
 }
 
