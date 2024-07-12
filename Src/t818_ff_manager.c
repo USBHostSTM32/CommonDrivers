@@ -135,42 +135,6 @@ static const uint8_t set_range[PACKET_SIZE] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-/**
- * @brief Sends an interrupt data packet to the device.
- *
- * @param urb_sender Pointer to the USB host handle.
- * @param buff Pointer to the data buffer to be sent.
- * @param length Length of the data buffer.
- * @param pipe_index Index of the USB pipe to be used.
- * @param Timeout Timeout duration for the operation.
- * @return T818_FF_Manager_StatusTypeDef Status of the operation.
- */
-/*
-static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(USBH_HandleTypeDef *urb_sender,
-    uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout) {
-    T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
-    uint32_t stop_time = HAL_GetTick() + Timeout;
-    USBH_URBStateTypeDef urb_status = USBH_LL_GetURBState(phost, pipe_index);
-    
-    while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time)){
-        urb_status = USBH_LL_GetURBState(phost, pipe_index);
-    }
-   
-    if ((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)) {
-        (void)USBH_InterruptSendData(phost, buff, length, pipe_index);
-        urb_status = USBH_LL_GetURBState(phost, pipe_index);
-        while ((urb_status != USBH_URB_DONE) && (urb_status != USBH_URB_IDLE) && (HAL_GetTick() < stop_time)){
-            osDelay(T818_INTERRUPT_DELAY);
-            urb_status = USBH_LL_GetURBState(phost, pipe_index);
-        }
-        if((urb_status == USBH_URB_DONE) || (urb_status == USBH_URB_IDLE)){
-            status = T818_FF_MANAGER_OK;
-        }
-    }
-
-	return status;
-}
-*/
 static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(urb_sender_t *urb_sender,
     uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout){
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
@@ -200,9 +164,9 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_init(urb_sender_t *urb_sender) {
         (__send_ff_packet(urb_sender, configuration_pack1) == T818_FF_MANAGER_OK) &&
         (__send_ff_packet(urb_sender, configuration_pack2) == T818_FF_MANAGER_OK) &&
         (__send_ff_packet(urb_sender, set_range) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_set_gain(urb_sender, 0xFF) == T818_FF_MANAGER_OK) &&
+        (t818_ff_manager_set_gain(urb_sender, 0xFF) == T818_FF_MANAGER_OK) /*&&
         (t818_ff_manager_upload_spring(urb_sender,0x2666) == T818_FF_MANAGER_OK) &&
-        (t818_ff_manager_play_spring(urb_sender) == T818_FF_MANAGER_OK)) {
+        (t818_ff_manager_play_spring(urb_sender) == T818_FF_MANAGER_OK)*/) {
 
     	status = T818_FF_MANAGER_OK;
     }

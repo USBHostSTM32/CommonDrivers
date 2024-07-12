@@ -54,6 +54,7 @@ PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki){
     if(pid != NULL){
         pid->kp = kp;
         pid->ki = ki;
+        pid->kd = kd;
         pid->e_old = 0;
         pid->u_old = 0;
 
@@ -66,31 +67,6 @@ PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki){
 		status = PID_OK;
     }
     return status;
-}
-
-/**
- * @brief Changes the parameters of the PID regulator.
- * 
- * This function changes the proportional gain (kp), integral gain (ki), and derivative gain of the PID regulator.
- * If clamping is used, the function also updates the saturator gain (sk) based on the new integral gain.
- * 
- * @param pid Pointer to the PID regulator structure.
- * @param kp New proportional gain.
- * @param ki New integral gain.
- * @param kd New derivative gain.
- */
-void pid_change_parameters(pid_t *pid, double kp, double ki, double kd){
-
-	#if defined(USE_CLAMPING)
-
-		pid->sk = pid->sk * (pid->ki/ki);
-
-	#endif
-
-	pid->kp = kp;
-	pid->ki = ki;
-    pid->kd = kd;
-
 }
 
 
@@ -121,5 +97,24 @@ PID_StatusTypeDef pid_calculate_output(pid_t *pid, double e, double *u){
             pid->u_old = *u;
             status = PID_OK;
     }
+    return status;
+}
+
+
+PID_StatusTypeDef pid_change_parameters(pid_t *pid, double kp, double ki, double kd)
+{
+    PID_StatusTypeDef status = PID_ERROR;
+	if((pid != NULL)){
+		#if defined(USE_CLAMPING)
+
+			pid->sk = pid->sk * (pid->ki/ki);
+
+		#endif
+
+		pid->kp = kp;
+		pid->ki = ki;
+		pid->kd = kd;
+        status = PID_OK;
+	}
     return status;
 }

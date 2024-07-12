@@ -37,9 +37,9 @@ typedef uint8_t PID_StatusTypeDef;
 
 
 
-#define PID_KP			((double)6.0)
+#define PID_KP			((double)7.0)
 #define PID_KI			((double)0.00)
-#define PID_KD			((double)40000)
+#define PID_KD			((double)10.0)
 #define PID_MAX_U		((double)32766.0)
 #define PID_MIN_U		((double)-32767.0)
 
@@ -116,7 +116,8 @@ PID_StatusTypeDef pid_calculate_output(pid_t *pid, double e, double *u);
  * @param kp New proportional gain
  * @param ki New integral gain
  * @param kd New derivative gain
+ * @return PID_OK if successful, PID_ERROR otherwise
  */
-void pid_change_parameters(pid_t *pid, double kp, double ki, double kd);
+PID_StatusTypeDef pid_change_parameters(pid_t *pid, double kp, double ki, double kd);
 
 #endif /* INC_PID_REGULATOR_H_ */

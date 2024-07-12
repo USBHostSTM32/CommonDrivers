@@ -133,9 +133,15 @@ uint32_t HID_ReadItem(HID_Report_ItemTypedef *ri, uint8_t ndx)
   }
   val = (val >> shift) & (((uint32_t)1U << ri->size) - 1U);
 
-  if ((val < ri->logical_min) || (val > ri->logical_max))
+
+  //NOW WE CLAMP OUTBOUNDARY VALUES TO THEIR MAX/MINIMUM
+  if ((val < ri->logical_min))
   {
-    return (0U);
+    val=ri->logical_min;
+  }
+  else if ((val > ri->logical_max))
+  {
+	  val=ri->logical_max;
   }
 
   /* convert logical value to physical value */
