@@ -1,5 +1,20 @@
 #include "t818_drive_control.h"
 
+/**
+ * @brief Pedal increment value.
+ */
+#define WAITING_WHEEL_BRAKE_INCREMENT (0.01f)
+
+/**
+ * @brief Pedal decrement value.
+ */
+#define WAITING_WHEEL_BRAKE_DECREMENT (0.01f)
+
+/**
+ * @brief Braking set point value.
+ */
+#define WAITING_WHEEL_BRAKE_SET_POINT (1.0f)
+
 typedef Button_StatusTypeDef (*button_init_func_t)(button_t*);
 
 typedef struct {
@@ -219,8 +234,8 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 				t818_drive_control->t818_driving_commands.braking_module =
 						calculate_new_smoothed_value(
 								t818_drive_control->t818_driving_commands.braking_module,
-								T818_BRAKING_SET_POINT, T818_PEDAL_INCREMENT,
-								T818_PEDAL_DECREMENT);
+								WAITING_WHEEL_BRAKE_SET_POINT, WAITING_WHEEL_BRAKE_INCREMENT,
+								WAITING_WHEEL_BRAKE_DECREMENT);
 				t818_drive_control->t818_driving_commands.throttling_module = 0;
 			}
 			status = T818_DC_OK;
