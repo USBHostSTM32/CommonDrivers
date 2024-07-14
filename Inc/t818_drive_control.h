@@ -79,7 +79,6 @@ typedef struct {
     float clutching_module; /**< Current clutching module value */
 
     button_t buttons[BUTTON_COUNT]; /**< Array of button states */
-
     DirectionalPadArrowPosition pad_arrow_position; /**< Current position of the directional pad arrow */
 } t818_driving_commands_t;
 
@@ -106,21 +105,6 @@ typedef struct {
  * @brief Macro indicating an error occurred.
  */
 #define T818_DC_ERROR     			 ((T818DriveControl_StatusTypeDef) 1U)
-
-/**
- * @brief Pedal increment value.
- */
-#define T818_PEDAL_INCREMENT (0.01f)
-
-/**
- * @brief Pedal decrement value.
- */
-#define T818_PEDAL_DECREMENT (0.01f)
-
-/**
- * @brief Braking set point value.
- */
-#define T818_BRAKING_SET_POINT (1.0f)
 
 /**
  * @brief Throttling set point value.
