@@ -78,7 +78,7 @@ static inline auto_control_state __update_auto_control_state_retro(
 			== BUTTON_PRESSED)
 			|| (auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
 					== BUTTON_PRESSED))
-			&& (__check_parking_enable(auto_control->auto_data_feedback.speed)
+			&& (__check_parking_enable(auto_control->auto_data_feedback->speed)
 					== CD_TRUE)) {
 		new_state = PARKING;
 	} else {
@@ -107,7 +107,7 @@ static inline auto_control_state __update_auto_control_state_neutral(
 		new_state = RETRO;
 	} else if ((auto_control->driving_commands->buttons[AUTO_CONTROL_PARKING_BUTTON].state
 			== BUTTON_PRESSED)
-			&& (__check_parking_enable(auto_control->auto_data_feedback.speed)
+			&& (__check_parking_enable(auto_control->auto_data_feedback->speed)
 					== CD_TRUE)) {
 		new_state = PARKING;
 	} else {
@@ -135,7 +135,7 @@ static inline auto_control_state __update_auto_control_state_drive(
 			|| (drive_comm->buttons[AUTO_CONTROL_NEUTRAL_BUTTON].state
 					== BUTTON_PRESSED)) {
 		new_state = NEUTRAL;
-	} else if ((__check_parking_enable(auto_control->auto_data_feedback.speed)
+	} else if ((__check_parking_enable(auto_control->auto_data_feedback->speed)
 			== CD_TRUE)
 			&& drive_comm->buttons[AUTO_CONTROL_PARKING_BUTTON].state
 					== BUTTON_PRESSED) {
@@ -313,40 +313,15 @@ static inline void __auto_control_data_init(
 	auto_control_data->speed = AUTO_CONTROL_MIN_SPEED;
 }
 
-/**
- * @brief Initializes auto data feedback structure with default values.
- *
- * This function initializes the fields of the `auto_data_feedback_t` structure
- * with default values.
- *
- * @param auto_data_feedback Pointer to the auto data feedback structure to initialize.
- */
-static inline void __auto_data_feedback_init(
-		auto_data_feedback_t *auto_data_feedback) {
-	auto_data_feedback->speed = AUTO_DATA_FEEDBACK_SPEED_ZERO;
-	auto_data_feedback->steer = AUTO_DATA_FEEDBACK_STEER_ZERO;
-	auto_data_feedback->braking = AUTO_DATA_FEEDBACK_BRAKING_MIN;
-	auto_data_feedback->gear = AUTO_DATA_FEEDBACK_GEAR_PARK;
-	auto_data_feedback->mode = AUTO_DATA_FEEDBACK_MODE_FRONT_AND_REAR;
-	auto_data_feedback->l_steer_light = CD_FALSE;
-	auto_data_feedback->r_steer_light = CD_FALSE;
-	auto_data_feedback->tail_light = CD_FALSE;
-	auto_data_feedback->braking_light = CD_FALSE;
-	auto_data_feedback->vehicle_status =
-	AUTO_DATA_FEEDBACK_VEICHLE_STATUS_NORMAL;
-	auto_data_feedback->vehicle_mode =
-	AUTO_DATA_FEEDBACK_VEICHLE_MODE_AUTONOMOUS_DRIVING;
-	auto_data_feedback->emergency_stop = CD_TRUE;
-}
 
 AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control,
-		t818_driving_commands_t *driving_commands) {
+		t818_driving_commands_t *driving_commands, auto_data_feedback_t *auto_data_feedback) {
 	AutoControl_StatusTypeDef status = AUTO_CONTROL_ERROR;
 
-	if ((auto_control != NULL) && (driving_commands != NULL)) {
+	if ((auto_control != NULL) && (driving_commands != NULL) && (auto_data_feedback != NULL)) {
 		auto_control->driving_commands = driving_commands;
 		__auto_control_data_init(&auto_control->auto_control_data);
-		__auto_data_feedback_init(&auto_control->auto_data_feedback);
+		auto_control->auto_data_feedback=auto_data_feedback;
 		auto_control->state = PARKING;
 
 		status = AUTO_CONTROL_OK;

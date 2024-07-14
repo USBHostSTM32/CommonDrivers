@@ -28,6 +28,7 @@
 #include <t818_ff_manager.h>
 #include <rotation_manager.h>
 #include <urb_sender.h>
+#include <auto_data_feedback.h>
 
 /* Defines ------------------------------------------------------------------*/
 #define UPDATE_STATE_PERIOD_MS                    (20U)
@@ -59,6 +60,7 @@ typedef struct {
     urb_sender_t urb_sender; /* URB Sender instance */
 
     t818_drive_control_t drive_control;
+    auto_data_feedback_t auto_data_feedback;
     auto_control_t auto_control;
     pid_t pid;
     rotation_manager_t rotation_manager;
