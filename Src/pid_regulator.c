@@ -69,7 +69,6 @@ PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki){
     return status;
 }
 
-
 /**
  * @brief Calculates the output of the PID regulator.
  * 
@@ -88,10 +87,10 @@ PID_StatusTypeDef pid_calculate_output(pid_t *pid, double e, double *u){
         #if defined(USE_NO_ANTI_WINDUP)
             *u = pid->u_old + pid->kp * e + pid->ki * pid->e_old;
         #elif defined(USE_CLAMPING)
-            if (!__stop_summation(*u, e, pid->ukmax, pid->ukmin)){
+            if (!__stop_summation(pid->u_old, e, pid->ukmax, pid->ukmin)){
                 pid->sk += e;
             }
-            *u = (pid->kp * e) + (pid->ki * pid->sk) + (pid->kd * (e - pid->e_old));
+            *u = clamp_float((pid->kp * e) + (pid->ki * pid->sk) + (pid->kd * (e - pid->e_old)), pid->ukmin, pid->ukmax);
         #endif
             pid->e_old = e;
             pid->u_old = *u;

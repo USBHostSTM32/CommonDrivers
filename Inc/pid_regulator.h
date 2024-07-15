@@ -9,7 +9,7 @@
 #define INC_PID_REGULATOR_H_
 
 #include <stdint.h>
-
+#include "common_drivers.h"
 
 /**
  * @def USE_NO_ANTI_WINDUP
@@ -40,8 +40,8 @@ typedef uint8_t PID_StatusTypeDef;
 #define PID_KP			((double)7.0)
 #define PID_KI			((double)0.00)
 #define PID_KD			((double)10.0)
-#define PID_MAX_U		((double)32766.0)
-#define PID_MIN_U		((double)-32767.0)
+#define PID_MAX_U		((double)16385.0)
+#define PID_MIN_U		((double)-16381.0)
 
 /**
  * @struct pid_t
