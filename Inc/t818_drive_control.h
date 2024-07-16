@@ -64,7 +64,7 @@ typedef enum {
  */
 typedef enum {
    WAITING_WHEEL_COFIGURATION,
-   READING_WHEEL,
+   MANUAL_DRIVING,
    AUTONOMOUS_DRIVING
 } t818_drive_control_state;
 

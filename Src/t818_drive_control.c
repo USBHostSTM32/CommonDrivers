@@ -228,7 +228,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 		case WAITING_WHEEL_COFIGURATION:
 			if (__check_wheel_is_ready(t818_drive_control) == CD_TRUE) {
 				if (t818_ff_manager_init(urb_sender) == T818_FF_MANAGER_OK) {
-					t818_drive_control->state = READING_WHEEL;
+					t818_drive_control->state = MANUAL_DRIVING;
 					status = T818_DC_OK;
 				}
 			} else {
@@ -242,7 +242,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 				status = T818_DC_OK;
 			}
 			break;
-		case READING_WHEEL:
+		case MANUAL_DRIVING:
 			status=__update_wheel(t818_drive_control,rotation_manager, 750.0f, t818_drive_control->t818_driving_commands.wheel_steering_degree);
 			break;
 		case AUTONOMOUS_DRIVING:
