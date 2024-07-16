@@ -78,12 +78,11 @@ DBWKernel_StatusTypeDef dbw_kernel_init(void) {
     
     // Initialize URB Sender
     if ((urb_sender_init(&instance->urb_sender, &urb_sender_config, instance->urb_queueHandle) == URB_SENDER_OK) &&
+    	(pid_init(&instance->pid,PID_KP, PID_KI, PID_KD, PID_MAX_U, PID_MIN_U) == PID_OK) &&
         (t818_drive_control_init(&instance->drive_control, &t818_config, USBH_HID_T818GetInstance()) == T818_DC_OK) &&
 		(auto_data_feedback_init(&instance->auto_data_feedback)== AUTO_DATA_FEEDBACK_OK) &&
         (auto_control_init(&instance->auto_control, &instance->drive_control.t818_driving_commands,&instance->auto_data_feedback) == AUTO_CONTROL_OK) &&
         (can_manager_init(&instance->can_manager, &can_manager_config) == CAN_MANAGER_OK) &&
-        (pid_init(&instance->pid,PID_KP, PID_KI, PID_KD, PID_MAX_U, PID_MIN_U) == PID_OK) &&
-        (t818_ff_manager_init(&instance->urb_sender) == T818_FF_MANAGER_OK) &&
         (rotation_manager_init(&instance->rotation_manager, &instance->pid, &instance->urb_sender) == ROTATION_MANAGER_OK)) {
         
         status = DBW_OK;

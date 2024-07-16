@@ -25,29 +25,30 @@ typedef struct {
 static const ButtonInitConfig button_init_configs[BUTTON_COUNT] = {
 		{ BUTTON_PADDLE_SHIFTER_LEFT, button_is_pressed_edge }, //USED
 		{ BUTTON_PADDLE_SHIFTER_RIGHT, button_is_pressed_edge }, //USED
-		{ BUTTON_DRINK, button_is_pressed_base }, { BUTTON_RADIO,
-				button_is_pressed_base }, { BUTTON_ONE_PLUS,
-				button_is_pressed_long }, { BUTTON_TEN_MINUS,
-				button_is_pressed_long },
+		{ BUTTON_DRINK, button_is_pressed_base },
+		{ BUTTON_RADIO, button_is_pressed_base },
+		{ BUTTON_ONE_PLUS, button_is_pressed_long },
+		{ BUTTON_TEN_MINUS, button_is_pressed_long },
 		{ BUTTON_SHA, button_is_pressed_level }, //USED
 		{ BUTTON_OIL, button_is_pressed_long },
 		{ BUTTON_PARKING, button_is_pressed_edge }, //USED
 		{ BUTTON_NEUTRAL, button_is_pressed_edge }, //USED
 		{ BUTTON_K1, button_is_pressed_level }, //USED
 		{ BUTTON_K2, button_is_pressed_level }, //USED
-		{ BUTTON_S1, button_is_pressed_edge }, { BUTTON_LEFT_SIDE_WHEEL_UP,
-				button_is_pressed_edge }, { BUTTON_LEFT_SIDE_WHEEL_DOWN,
-				button_is_pressed_edge }, { BUTTON_RIGHT_SIDE_WHEEL_UP,
-				button_is_pressed_edge }, { BUTTON_RIGHT_SIDE_WHEEL_DOWN,
-				button_is_pressed_base }, { BUTTON_GRIP_ANTICLOCKWISE,
-				button_is_pressed_base }, { BUTTON_GRIP_CLOCKWISE,
-				button_is_pressed_long }, { BUTTON_ENG_ANTICLOCKWISE,
-				button_is_pressed_long }, { BUTTON_ENG_CLOCKWISE,
-				button_is_pressed_level },
-		{ BUTTON_22, button_is_pressed_level }, { BUTTON_23,
-				button_is_pressed_edge },
-		{ BUTTON_GRIP, button_is_pressed_edge }, { BUTTON_ENG,
-				button_is_pressed_base } };
+		{ BUTTON_S1, button_is_pressed_edge },
+		{ BUTTON_LEFT_SIDE_WHEEL_UP, button_is_pressed_edge },
+		{ BUTTON_LEFT_SIDE_WHEEL_DOWN,button_is_pressed_edge },
+		{ BUTTON_RIGHT_SIDE_WHEEL_UP,button_is_pressed_edge },
+		{ BUTTON_RIGHT_SIDE_WHEEL_DOWN,button_is_pressed_base },
+		{ BUTTON_GRIP_ANTICLOCKWISE, button_is_pressed_base },
+		{ BUTTON_GRIP_CLOCKWISE,button_is_pressed_long },
+		{ BUTTON_ENG_ANTICLOCKWISE, button_is_pressed_long },
+		{ BUTTON_ENG_CLOCKWISE, button_is_pressed_level },
+		{ BUTTON_22, button_is_pressed_level },
+		{ BUTTON_23, button_is_pressed_edge },
+		{ BUTTON_GRIP, button_is_pressed_edge },
+		{ BUTTON_ENG, button_is_pressed_base }
+};
 
 static T818DriveControl_StatusTypeDef t818_driving_commands_init(
 		t818_driving_commands_t *t818_driving_commands) {
@@ -175,28 +176,6 @@ static inline T818DriveControl_StatusTypeDef __t818_drive_control_update(
 	return status;
 }
 
-/**
- * @brief Checks if the wheel is linked.
- *
- * This function checks if the T818 wheel is linked by verifying the USB HID state.
- *
- * @param[in] t818_drive_control Pointer to the T818 drive control structure.
- * @return True if the wheel is linked, false otherwise.
- */
-static inline bool8u __check_wheel_is_linked(
-		t818_drive_control_t *t818_drive_control) {
-	bool8u wheel_linked = CD_FALSE;
-
-	if (t818_drive_control->config->t818_host_handle->pActiveClass != NULL) {
-		const HID_HandleTypeDef *active_class =
-				(HID_HandleTypeDef*) t818_drive_control->config->t818_host_handle->pActiveClass->pData;
-		if ((active_class->state == USBH_HID_POLL)
-				|| (active_class->state == USBH_HID_GET_DATA)) {
-			wheel_linked = CD_TRUE;
-		}
-	}
-	return wheel_linked;
-}
 
 /**
  * @brief Checks if the wheel is ready.
@@ -211,7 +190,7 @@ static inline bool8u __check_wheel_is_ready(
 		t818_drive_control_t *t818_drive_control) {
 	uint8_t wheel_ready = CD_FALSE;
 
-	if (__check_wheel_is_linked(t818_drive_control) == CD_TRUE) {
+	if (check_wheel_is_linked(t818_drive_control->config->t818_host_handle) == CD_TRUE) {
 		if ((t818_drive_control->t818_info->brake == T818_BRAKE_MAX)
 				&& (t818_drive_control->t818_info->throttle == T818_THROTTLE_MAX)
 				&& (t818_drive_control->t818_info->clutch == T818_CLUTCH_MAX)) {
@@ -222,37 +201,58 @@ static inline bool8u __check_wheel_is_ready(
 	return wheel_ready;
 }
 
-T818DriveControl_StatusTypeDef t818_drive_control_step(
-		t818_drive_control_t *t818_drive_control) {
+static inline T818DriveControl_StatusTypeDef __update_wheel(t818_drive_control_t *t818_drive_control, rotation_manager_t* rotation_manager,float steer_reference, float actual_steer)
+{
 	T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
-	if (t818_drive_control != NULL) {
+
+	if (check_wheel_is_linked(t818_drive_control->config->t818_host_handle) == CD_TRUE) {
+		if((__t818_drive_control_update(t818_drive_control)==T818_DC_OK) &&
+		   (rotation_manager_update(rotation_manager, map_value_float(steer_reference, 660.0f, 840.0f,-1024.0f, 1024.0f),map_value_float(actual_steer,-30, 30, -1024, 1024)) == ROTATION_MANAGER_OK))
+		{
+			status = T818_DC_OK;
+		}
+	}
+	else
+	{
+		t818_drive_control->state = WAITING_WHEEL_COFIGURATION;
+		status = T818_DC_OK;
+	}
+	return status;
+}
+
+T818DriveControl_StatusTypeDef t818_drive_control_step(
+		t818_drive_control_t *t818_drive_control, urb_sender_t *urb_sender, rotation_manager_t* rotation_manager,int16_t steer_feedback) {
+	T818DriveControl_StatusTypeDef status = T818_DC_ERROR;
+	if ((t818_drive_control != NULL) && (urb_sender!=NULL) && (rotation_manager != NULL)) {
 		switch (t818_drive_control->state) {
 		case WAITING_WHEEL_COFIGURATION:
 			if (__check_wheel_is_ready(t818_drive_control) == CD_TRUE) {
-				t818_drive_control->state = READING_WHEEL;
+				if (t818_ff_manager_init(urb_sender) == T818_FF_MANAGER_OK) {
+					t818_drive_control->state = READING_WHEEL;
+					status = T818_DC_OK;
+				}
 			} else {
 				t818_drive_control->t818_driving_commands.braking_module =
 						calculate_new_smoothed_value(
 								t818_drive_control->t818_driving_commands.braking_module,
-								WAITING_WHEEL_BRAKE_SET_POINT, WAITING_WHEEL_BRAKE_INCREMENT,
+								WAITING_WHEEL_BRAKE_SET_POINT,
+								WAITING_WHEEL_BRAKE_INCREMENT,
 								WAITING_WHEEL_BRAKE_DECREMENT);
 				t818_drive_control->t818_driving_commands.throttling_module = 0;
-			}
-			status = T818_DC_OK;
-			break;
-		case READING_WHEEL:
-			if (__check_wheel_is_linked(t818_drive_control) == CD_TRUE) {
-				status = __t818_drive_control_update(t818_drive_control);
-			} else {
-				t818_drive_control->state = WAITING_WHEEL_COFIGURATION;
 				status = T818_DC_OK;
 			}
 			break;
+		case READING_WHEEL:
+			status=__update_wheel(t818_drive_control,rotation_manager, 750.0f, t818_drive_control->t818_driving_commands.wheel_steering_degree);
+			break;
+		case AUTONOMOUS_DRIVING:
+			status=__update_wheel(t818_drive_control,rotation_manager, steer_feedback, t818_drive_control->t818_driving_commands.wheel_steering_degree);
+			break;
 		default:
 			break;
-
 		}
 
 	}
 	return status;
 }
+

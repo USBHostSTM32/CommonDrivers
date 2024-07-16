@@ -14,6 +14,7 @@
 
 #include "stdint.h"
 #include "math.h"
+#include "usbh_hid.h"
 
 /**
  * @brief Unsigned 8-bit boolean type.
@@ -77,5 +78,15 @@ float map_value_float(float x, float in_min, float in_max, float out_min,
  */
 float calculate_new_smoothed_value(float current_value, float set_point,
 		float max_increment, float max_decrement);
+
+/**
+ * @brief Checks if the wheel is linked.
+ *
+ * This function checks if the T818 wheel is linked by verifying the USB HID state.
+ *
+ * @param[in] host_handle Pointer to the USB host handle.
+ * @return True if the wheel is linked, false otherwise.
+ */
+bool8u check_wheel_is_linked(USBH_HandleTypeDef *host_handle);
 
 #endif /* INC_COMMON_DRIVERS_H_ */

@@ -65,3 +65,23 @@ float calculate_new_smoothed_value(float current_value, float set_point,
 	}
 	return (float) new_smoothed;
 }
+
+/**
+ * @brief Checks if the wheel is linked.
+ *
+ * This function checks if the T818 wheel is linked by verifying the USB HID state.
+ *
+ * @param[in] host_handle Pointer to the USB host handle.
+ * @return True if the wheel is linked, false otherwise.
+ */
+bool8u check_wheel_is_linked(USBH_HandleTypeDef *host_handle) {
+    bool8u wheel_linked = CD_FALSE;
+    if (host_handle->pActiveClass != NULL) {
+        const HID_HandleTypeDef *active_class = (HID_HandleTypeDef*) host_handle->pActiveClass->pData;
+        if ((active_class->state == USBH_HID_POLL) || (active_class->state == USBH_HID_GET_DATA)) {
+            wheel_linked = CD_TRUE;
+        }
+    }
+    return wheel_linked;
+}
+

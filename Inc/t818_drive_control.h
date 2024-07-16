@@ -18,6 +18,7 @@
 #include "math.h"
 #include "common_drivers.h"
 #include "t818_ff_manager.h"
+#include "rotation_manager.h"
 
 
 /* Type Definitions ---------------------------------------------------------*/
@@ -63,7 +64,8 @@ typedef enum {
  */
 typedef enum {
    WAITING_WHEEL_COFIGURATION,
-   READING_WHEEL
+   READING_WHEEL,
+   AUTONOMOUS_DRIVING
 } t818_drive_control_state;
 
 /* Data Structure Definitions -----------------------------------------------*/
@@ -145,6 +147,6 @@ T818DriveControl_StatusTypeDef t818_drive_control_init(
  * @param t818_drive_control Pointer to the drive control instance.
  * @return T818_DC_OK if the step was executed successfully, otherwise T818_DC_ERROR.
  */
-T818DriveControl_StatusTypeDef t818_drive_control_step(t818_drive_control_t *t818_drive_control);
+T818DriveControl_StatusTypeDef t818_drive_control_step(t818_drive_control_t *t818_drive_control, urb_sender_t *urb_sender, rotation_manager_t* rotation_manager,int16_t steer_feedback);
 
 #endif /* INC_T818_DRIVE_CONTROL_H_ */
