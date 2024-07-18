@@ -39,26 +39,26 @@ CanManager_StatusTypeDef __add_message_to_mailbox(can_manager_t *can_manager, co
 
 CanManager_StatusTypeDef __abort_message(can_manager_t *can_manager){
 
-	CanManager_StatusTypeDef status = CAN_MANAGER_ERROR;
-	uint8_t abort_complete=CD_FALSE;
+    CanManager_StatusTypeDef status = CAN_MANAGER_ERROR;
+    uint8_t abort_complete = CD_FALSE;
     const can_manager_config_t *config = (const can_manager_config_t*) can_manager->config;
-	HAL_CAN_AbortTxRequest(can_manager->config->hcan, can_manager->auto_control_tx_mailbox);
 
-	uint32_t start_tick=HAL_GetTick();
-	do
-	{
-		if(HAL_CAN_IsTxMessagePending(config->hcan, can_manager->auto_control_tx_mailbox) == CAN_MANAGER_MESSAGE_NOT_PENDING)
-		{
-			abort_complete=CD_TRUE;
-		}
-	}while( (abort_complete==CD_FALSE) && (start_tick-HAL_GetTick()<=2));
+    HAL_CAN_AbortTxRequest(can_manager->config->hcan, can_manager->auto_control_tx_mailbox);
 
-	if(abort_complete==CD_TRUE)
-	{
-		status=CAN_MANAGER_OK;
-	}
+    static const uint32_t Timeout = 2U;
+    uint32_t stop_time = HAL_GetTick() + Timeout;
 
-	return status;
+    do {
+        if (HAL_CAN_IsTxMessagePending(config->hcan, can_manager->auto_control_tx_mailbox) == CAN_MANAGER_MESSAGE_NOT_PENDING) {
+            abort_complete = CD_TRUE;
+        }
+    } while ((abort_complete == CD_FALSE) && (HAL_GetTick() <= stop_time));
+
+    if (abort_complete == CD_TRUE) {
+        status = CAN_MANAGER_OK;
+    }
+
+    return status;
 }
 
 CanManager_StatusTypeDef __send_message(can_manager_t *can_manager, const uint8_t *can_data){
@@ -70,13 +70,9 @@ CanManager_StatusTypeDef __send_message(can_manager_t *can_manager, const uint8_
     }
     else
     {
-    	if(__abort_message(can_manager)==CAN_MANAGER_OK)
+    	if(__abort_message(can_manager) == CAN_MANAGER_OK)
     	{
     		status=__add_message_to_mailbox(can_manager, can_data);
-    	}
-    	else
-    	{
-    		status=CAN_MANAGER_ERROR;
     	}
     }
     return status;
