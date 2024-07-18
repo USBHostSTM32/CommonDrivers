@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include "can.h"
+#include "common_drivers.h"
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
@@ -37,6 +38,12 @@ typedef uint8_t CanManager_StatusTypeDef;
  * @brief Size of the CAN manager reception data buffer.
  */
 #define CAN_MANAGER_RX_DATA_SIZE (8U)
+
+/**
+ * @brief Value meaning the mailbox is free.
+ */
+#define CAN_MANAGER_MESSAGE_NOT_PENDING (0U)
+
 
 /* Data Structure Definitions -----------------------------------------------*/
 /**
@@ -59,7 +66,6 @@ typedef struct {
 typedef struct {
     can_manager_config_t const *config; /**< Pointer to the CAN Manager configuration */
     uint32_t auto_control_tx_mailbox;   /**< Mailbox for auto control transmission */
-    uint8_t n_tries;                    /**< Number of transmission tries */
     CAN_RxHeaderTypeDef RxHeader;       /**< CAN receive header */
     uint8_t tx_data[CAN_MANAGER_TX_DATA_SIZE]; /**< Transmission data buffer */
     uint8_t rx_data[CAN_MANAGER_RX_DATA_SIZE]; /**< Reception data buffer */

@@ -52,6 +52,7 @@ extern "C" {
   */
 
 #define HID_MIN_POLL                                10U
+#define HID_CUSTOM_POLL								20U
 #define HID_REPORT_SIZE                             8U
 #define HID_MAX_USAGE                               8U
 #define HID_MAX_NBR_REPORT_FMT                      8U

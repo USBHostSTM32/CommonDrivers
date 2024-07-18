@@ -3,17 +3,50 @@
 /**
  * @brief Pedal increment value.
  */
-#define WAITING_WHEEL_BRAKE_INCREMENT (0.01f)
+#define WAITING_WHEEL_BRAKE_INCREMENT 	(0.01f)
 
 /**
  * @brief Pedal decrement value.
  */
-#define WAITING_WHEEL_BRAKE_DECREMENT (0.01f)
+#define WAITING_WHEEL_BRAKE_DECREMENT 	(0.01f)
 
 /**
  * @brief Braking set point value.
  */
-#define WAITING_WHEEL_BRAKE_SET_POINT (1.0f)
+#define WAITING_WHEEL_BRAKE_SET_POINT 	(1.0f)
+/**
+ * @brief Zero steering reference value.
+ */
+#define ZERO_STEER_REFERENCE			(750.0f)
+/**
+ * @brief Minimum input steering reference value.
+ */
+#define MIN_IN_STEER_REFERENCE           (660.0f)
+
+/**
+ * @brief Maximum input steering reference value.
+ */
+#define MAX_IN_STEER_REFERENCE           (840.0f)
+
+/**
+ * @brief Minimum output steering value.
+ */
+#define MIN_OUT_STEER                    (-1024.0f)
+
+/**
+ * @brief Maximum output steering value.
+ */
+#define MAX_OUT_STEER                    (1024.0f)
+
+/**
+ * @brief Minimum actual input steering value.
+ */
+#define MIN_IN_ACTUAL_STEER              (-30.0f)
+
+/**
+ * @brief Maximum actual input steering value.
+ */
+#define MAX_IN_ACTUAL_STEER              (30.0f)
 
 typedef Button_StatusTypeDef (*button_init_func_t)(button_t*);
 
@@ -207,7 +240,7 @@ static inline T818DriveControl_StatusTypeDef __update_wheel(t818_drive_control_t
 
 	if (check_wheel_is_linked(t818_drive_control->config->t818_host_handle) == CD_TRUE) {
 		if((__t818_drive_control_update(t818_drive_control)==T818_DC_OK) &&
-		   (rotation_manager_update(rotation_manager, map_value_float(steer_reference, 660.0f, 840.0f,-1024.0f, 1024.0f),map_value_float(actual_steer,-30, 30, -1024, 1024)) == ROTATION_MANAGER_OK))
+		   (rotation_manager_update(rotation_manager, map_value_float(steer_reference, MIN_IN_STEER_REFERENCE, MAX_IN_STEER_REFERENCE,MIN_OUT_STEER, MAX_OUT_STEER),map_value_float(actual_steer,MIN_IN_ACTUAL_STEER, MAX_IN_ACTUAL_STEER, MIN_OUT_STEER, MAX_OUT_STEER)) == ROTATION_MANAGER_OK))
 		{
 			status = T818_DC_OK;
 		}
@@ -243,7 +276,7 @@ T818DriveControl_StatusTypeDef t818_drive_control_step(
 			}
 			break;
 		case MANUAL_DRIVING:
-			status=__update_wheel(t818_drive_control,rotation_manager, 750.0f, t818_drive_control->t818_driving_commands.wheel_steering_degree);
+			status=__update_wheel(t818_drive_control,rotation_manager, ZERO_STEER_REFERENCE, t818_drive_control->t818_driving_commands.wheel_steering_degree);
 			break;
 		case AUTONOMOUS_DRIVING:
 			status=__update_wheel(t818_drive_control,rotation_manager, steer_feedback, t818_drive_control->t818_driving_commands.wheel_steering_degree);
