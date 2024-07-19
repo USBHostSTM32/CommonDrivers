@@ -33,8 +33,8 @@ typedef uint8_t T818_FF_Manager_StatusTypeDef;
 /** @brief Macro indicating an error occurred. */
 #define T818_FF_MANAGER_ERROR 									((T818_FF_Manager_StatusTypeDef) 1U)
 
-/** @brief Maximum delay for T818 operations. */
-#define T818_FF_MANAGER_MAX_DELAY	100U
+#define T818_FF_MANAGER_MAX_CONSTANT_VALUE						((int16_t) 16381)
+#define T818_FF_MANAGER_MIN_CONSTANT_VALUE						((int16_t)-16385)
 
 
 /**

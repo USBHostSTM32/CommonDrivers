@@ -150,7 +150,7 @@ DBWKernel_StatusTypeDef dbw_kernel_init(void) {
     
     // Initialize URB Sender
     if ((urb_sender_init(&instance->urb_sender, &urb_sender_config, instance->urb_queueHandle) == URB_SENDER_OK) &&
-    	(pid_init(&instance->pid,PID_KP, PID_KI, PID_KD, PID_MAX_U, PID_MIN_U) == PID_OK) &&
+    	(pid_init(&instance->pid,PID_KP, PID_KI, PID_KD, T818_FF_MANAGER_MIN_CONSTANT_VALUE, T818_FF_MANAGER_MAX_CONSTANT_VALUE) == PID_OK) &&
         (t818_drive_control_init(&instance->drive_control, &t818_config, USBH_HID_T818GetInstance()) == T818_DC_OK) &&
 		(auto_data_feedback_init(&instance->auto_data_feedback)== AUTO_DATA_FEEDBACK_OK) &&
         (auto_control_init(&instance->auto_control, &instance->drive_control.t818_driving_commands,&instance->auto_data_feedback) == AUTO_CONTROL_OK) &&
@@ -171,7 +171,7 @@ DBWKernel_StatusTypeDef dbw_kernel_init(void) {
  * @return Status of the state update step.
  */
 DBWKernel_StatusTypeDef dbw_kernel_update_state_step(void) {
-    DBWKernel_StatusTypeDef status = DBW_ERROR;
+    DBWKernel_StatusTypeDef status = DBW_OK;
 
 #ifdef USE_CAN
     if (can_parser_from_array_to_auto_control_feedback(dbw_kernel_state.can_manager.rx_data,

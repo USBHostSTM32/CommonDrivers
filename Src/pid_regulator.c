@@ -31,11 +31,11 @@ static inline uint8_t __stop_summation(double u, double e, double ukmax, double 
  * @param kp Proportional gain.
  * @param ki Integral gain.
  * @param kd Derivative gain.
- * @param ukmax Upper clamping limit.
  * @param ukmin Lower clamping limit.
+ * @param ukmax Upper clamping limit.
  * @return PID_StatusTypeDef PID_OK if successful, PID_ERROR otherwise.
  */
-PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki,double kd, double ukmax, double ukmin){
+PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki,double kd, double ukmin, double ukmax){
 #else
 /**
  * @brief Initializes the PID regulator without clamping.

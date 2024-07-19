@@ -40,8 +40,6 @@ typedef uint8_t PID_StatusTypeDef;
 #define PID_KP			((double)-7.0)
 #define PID_KI			((double)0.00)
 #define PID_KD			((double)-10.0)
-#define PID_MAX_U		((double)16385.0)
-#define PID_MIN_U		((double)-16381.0)
 
 /**
  * @struct pid_t
@@ -88,11 +86,11 @@ typedef struct {
 	 * @param kp Proportional gain
 	 * @param ki Integral gain
 	 * @param kd Derivative gain
-	 * @param ukmax Maximum control output value
 	 * @param ukmin Minimum control output value
+	 * @param ukmax Maximum control output value
 	 * @return PID_OK if successful, PID_ERROR otherwise
 	 */
-	PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki, double kd, double ukmax, double ukmin);
+	PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki, double kd, double ukmin, double ukmax);
 #endif
 
 /**

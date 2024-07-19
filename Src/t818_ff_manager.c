@@ -14,30 +14,31 @@
 #include "t818_ff_manager.h"
 
 /** @brief Index for the effect ID in the packet. */
-#define ID_INDEX                                            (2U)
+#define ID_INDEX                                            		(2U)
 /** @brief ID for the spring effect. */
-#define SPRING_ID                                           (0x01U)
+#define SPRING_ID                                           		(0x01U)
 /** @brief ID for the constant force effect. */
-#define COSTANT_ID                                          (0x02U)
+#define COSTANT_ID                                          		(0x02U)
 /** @brief Index for the gain value in the packet. */
-#define GAIN_INDEX                                          (2U)
+#define GAIN_INDEX                                          		(2U)
 /** @brief Index for the low byte of the constant force value in the packet. */
-#define COSTANT_LOW_VALUE_INDEX                             (4U)
+#define COSTANT_LOW_VALUE_INDEX                             		(4U)
 /** @brief Index for the high byte of the constant force value in the packet. */
-#define COSTANT_HI_VALUE_INDEX                              (5U)
+#define COSTANT_HI_VALUE_INDEX                              		(5U)
 
-#define SPRING_FIRST_LOW_VALUE_INDEX                             (4U)
-#define SPRING_FIRST_HI_VALUE_INDEX                              (5U)
+#define SPRING_FIRST_LOW_VALUE_INDEX                             	(4U)
+#define SPRING_FIRST_HI_VALUE_INDEX                              	(5U)
 
-#define SPRING_SECOND_LOW_VALUE_INDEX                             (6U)
-#define SPRING_SECOND_HI_VALUE_INDEX                              (7U)
+#define SPRING_SECOND_LOW_VALUE_INDEX                             	(6U)
+#define SPRING_SECOND_HI_VALUE_INDEX                              	(7U)
 
 /** @brief Delay for USB interrupt operations. */
-#define T818_INTERRUPT_DELAY								(1U)
+#define T818_INTERRUPT_DELAY										(1U)
 /** @brief Size of the packets sent to the device. */
-#define PACKET_SIZE                                         (64U)
+#define PACKET_SIZE                                         		(64U)
 /** @brief Pipe index for force feedback management on the T818. */
-#define FF_PIPE_INDEX       								(0x03)
+#define FF_PIPE_INDEX       										(0x03)
+
 
 /** @brief Configuration packet 1 for initializing the T818. */
 static const uint8_t configuration_pack1[PACKET_SIZE] = {
@@ -135,8 +136,20 @@ static const uint8_t set_range[PACKET_SIZE] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+static inline int16_t __clamp_int16(int16_t val, int16_t min, int16_t max){
+	int16_t ret = 0;
+	if(val > max){
+		ret = max;
+	} else if(val < min){
+		ret = min;
+	} else {
+		ret = val;
+	}
+	return ret;
+}
+
 static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(urb_sender_t *urb_sender,
-    uint8_t *buff, uint8_t length, uint8_t pipe_index, uint32_t Timeout){
+    uint8_t *buff, uint8_t length, uint8_t pipe_index){
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
     urb_interr_msg_t interr_msg;
     interr_msg.pipe_num = pipe_index;
@@ -155,7 +168,7 @@ static inline T818_FF_Manager_StatusTypeDef __send_interrupt_data(urb_sender_t *
  * @return T818_FF_Manager_StatusTypeDef Status of the operation.
  */
 static inline T818_FF_Manager_StatusTypeDef __send_ff_packet(urb_sender_t *urb_sender, const uint8_t *buff) {
-    return __send_interrupt_data(urb_sender, (uint8_t *)buff, PACKET_SIZE, FF_PIPE_INDEX, T818_FF_MANAGER_MAX_DELAY);
+    return __send_interrupt_data(urb_sender, (uint8_t *)buff, PACKET_SIZE, FF_PIPE_INDEX);
 }
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_init(urb_sender_t *urb_sender) {
@@ -203,12 +216,13 @@ T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_spring(urb_sender_t *urb_se
 
 T818_FF_Manager_StatusTypeDef t818_ff_manager_upload_costant(urb_sender_t *urb_sender, int16_t value) {
     T818_FF_Manager_StatusTypeDef status = T818_FF_MANAGER_ERROR;
+    int16_t clamped_val = __clamp_int16(value, T818_FF_MANAGER_MIN_CONSTANT_VALUE, T818_FF_MANAGER_MAX_CONSTANT_VALUE);
     if (urb_sender != NULL) {
         uint8_t tx_data[PACKET_SIZE];
         if (memcpy(tx_data, costant_base, PACKET_SIZE) == tx_data) {
             tx_data[ID_INDEX] = COSTANT_ID;
-            tx_data[COSTANT_LOW_VALUE_INDEX] = value & 0x00FF;
-            tx_data[COSTANT_HI_VALUE_INDEX] = (value >> 8) & (0x00FF);
+            tx_data[COSTANT_LOW_VALUE_INDEX] = clamped_val & 0x00FF;
+            tx_data[COSTANT_HI_VALUE_INDEX] = (clamped_val >> 8) & (0x00FF);
             status = __send_ff_packet(urb_sender, tx_data);
         }
     }
