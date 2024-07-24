@@ -33,7 +33,7 @@
 /* Defines ------------------------------------------------------------------*/
 #define UPDATE_STATE_PERIOD_MS                    (20U)
 #define URB_TX_PERIOD_MS                          (2U)
-//#define USE_CAN
+#define USE_CAN
 
 /* Type Definitions ---------------------------------------------------------*/
 /**
