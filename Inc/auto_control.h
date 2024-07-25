@@ -62,7 +62,7 @@
 
 /* Speed Definitions --------------------------------------------------------*/
 /** @brief Maximum speed definition */
-#define AUTO_CONTROL_MAX_SPEED                (1024.0F)
+#define AUTO_CONTROL_MAX_SPEED                (1024U)
 /** @brief Minimum speed definition */
 #define AUTO_CONTROL_MIN_SPEED                (0U)
 /** @brief Maximum speed increment */

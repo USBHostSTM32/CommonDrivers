@@ -64,11 +64,13 @@ typedef struct {
  * This structure represents an instance of the CAN Manager.
  */
 typedef struct {
-    can_manager_config_t const *config; /**< Pointer to the CAN Manager configuration */
-    uint32_t auto_control_tx_mailbox;   /**< Mailbox for auto control transmission */
-    CAN_RxHeaderTypeDef RxHeader;       /**< CAN receive header */
-    uint8_t tx_data[CAN_MANAGER_TX_DATA_SIZE]; /**< Transmission data buffer */
-    uint8_t rx_data[CAN_MANAGER_RX_DATA_SIZE]; /**< Reception data buffer */
+    can_manager_config_t const *config;             /**< Pointer to the CAN Manager configuration */
+    uint32_t auto_control_tx_mailbox;               /**< Mailbox for auto control transmission */
+    CAN_RxHeaderTypeDef RxHeader;                   /**< CAN receive header */
+    uint8_t tx_data[CAN_MANAGER_TX_DATA_SIZE];      /**< Transmission data buffer */
+    uint8_t rx_data[CAN_MANAGER_RX_DATA_SIZE];      /**< Reception data buffer */
+    uint32_t max_can_occupancy_cnt;                 /**< Maximum CAN occupancy count */
+    uint32_t can_occupancy_cnt;                     /**< Current CAN occupancy count */
 } can_manager_t;
 
 /* Defines ------------------------------------------------------------------*/

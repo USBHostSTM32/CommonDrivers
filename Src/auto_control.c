@@ -184,10 +184,17 @@ static inline void __basic_rules(auto_control_t *auto_control) {
  * @brief
  */
 static inline uint16_t __calculate_speed(float current_speed, float set_point) {
+	uint16_t speed_u16 = 0U;
 	float speed = calculate_new_smoothed_value(current_speed,
-			set_point * AUTO_CONTROL_MAX_SPEED,
+			set_point * ((float)AUTO_CONTROL_MAX_SPEED),
 			AUTO_CONTROL_SPEED_MAX_INCREMENT, AUTO_CONTROL_SPEED_MAX_DECREMENT);
-	return (uint16_t) roundf(speed);
+
+	speed_u16 = (uint16_t) roundf(speed);
+	if(speed_u16 > AUTO_CONTROL_MAX_SPEED){
+		speed_u16 = AUTO_CONTROL_MAX_SPEED;
+	}
+
+	return speed_u16;
 }
 
 /*

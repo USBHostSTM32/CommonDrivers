@@ -16,7 +16,13 @@ CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager, const can_
     CanManager_StatusTypeDef status = CAN_MANAGER_ERROR;
     if ((can_manager != NULL) && (config != NULL) && (config->hcan != NULL)) {
         can_manager->config = config;
-        if ((HAL_CAN_Start(can_manager->config->hcan) == HAL_OK) &&
+        can_manager->auto_control_tx_mailbox = 0U;
+        can_manager->can_occupancy_cnt = 0U;
+        can_manager->max_can_occupancy_cnt = 0U;
+
+        if ((memset(can_manager->tx_data, 0x00, CAN_MANAGER_TX_DATA_SIZE) == can_manager->tx_data) &&
+        	(memset(can_manager->rx_data, 0x00, CAN_MANAGER_RX_DATA_SIZE) == can_manager->rx_data) &&
+        	(HAL_CAN_Start(can_manager->config->hcan) == HAL_OK) &&
             (HAL_CAN_ActivateNotification(can_manager->config->hcan, can_manager->config->auto_data_feedback_rx_interrupt) == HAL_OK)) {
             status = CAN_MANAGER_OK;
         }
@@ -67,9 +73,15 @@ CanManager_StatusTypeDef __send_message(can_manager_t *can_manager, const uint8_
 
     if (HAL_CAN_IsTxMessagePending(config->hcan, can_manager->auto_control_tx_mailbox) == CAN_MANAGER_MESSAGE_NOT_PENDING) {
     	status=__add_message_to_mailbox(can_manager, can_data);
+    	can_manager->can_occupancy_cnt = 0U;
     }
     else
     {
+    	(can_manager->can_occupancy_cnt)++;
+    	if(can_manager->can_occupancy_cnt > can_manager->max_can_occupancy_cnt){
+    		can_manager->max_can_occupancy_cnt = can_manager->can_occupancy_cnt;
+    	}
+
     	if(__abort_message(can_manager) == CAN_MANAGER_OK)
     	{
     		status=__add_message_to_mailbox(can_manager, can_data);
