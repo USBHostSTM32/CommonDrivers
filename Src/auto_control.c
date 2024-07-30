@@ -261,7 +261,7 @@ static inline void __parking_rules(auto_control_t *auto_control) {
 	auto_control->auto_control_data.EBP = CD_TRUE;
 	auto_control->auto_control_data.gear_shift =
 	AUTO_CONTROL_GEAR_SHIFT_PARK;
-	auto_control->auto_control_data.braking = AUTO_CONTROL_MAX_BRAKING;
+	auto_control->auto_control_data.braking = AUTO_CONTROL_PARKING_BRAKING;
 	auto_control->auto_control_data.speed = AUTO_CONTROL_MIN_SPEED;
 }
 
