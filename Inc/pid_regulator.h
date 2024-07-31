@@ -37,9 +37,9 @@ typedef uint8_t PID_StatusTypeDef;
 
 
 
-#define PID_KP			((double)-7.2015)
+#define PID_KP			((double)-4.4795)
 #define PID_KI			((double)0.00)
-#define PID_KD			((double)-10.2427)
+#define PID_KD			((double)-10.2476)
 
 /**
  * @struct pid_t
