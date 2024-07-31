@@ -73,6 +73,8 @@
 /* Braking Definitions ------------------------------------------------------*/
 /** @brief Maximum braking definition */
 #define AUTO_CONTROL_MAX_BRAKING              (1024U)
+/** @brief Braking in parking mode definition */
+#define AUTO_CONTROL_PARKING_BRAKING		  (60U)
 /** @brief Minimum braking definition */
 #define AUTO_CONTROL_MIN_BRAKING              (0U)
 
