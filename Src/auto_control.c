@@ -16,18 +16,18 @@
 /**
  * @brief Checks if parking is enabled based on speed command.
  *
- * This function checks whether parking is enabled based on the provided speed command.
- * Parking is considered enabled if the absolute value of the speed command is less than
+ * This function checks whether parking is enabled based on the provided speed feedback.
+ * Parking could be enabled if the absolute value of the speed command is less than
  * a predefined threshold (`speed_threshold`).
  *
- * @param speed_cmd The speed command to be checked.
+ * @param speed_feedback The speed feedback to be checked.
  * @return CD_TRUE if parking is enabled, CD_FALSE otherwise.
  */
-static inline bool8u __check_parking_enable(int16_t speed_cmd) {
-	static const int16_t speed_threshold = 10U; /**< Threshold for speed command to enable parking */
+static inline bool8u __check_parking_enable(int16_t speed_feedback) {
+	static const int16_t speed_threshold = 10U; /**< Threshold for speed feedback to enable parking */
 	bool8u ret = CD_FALSE;
 
-	if ((speed_cmd < speed_threshold) && (speed_cmd > (-1 * speed_threshold))) {
+	if ((speed_feedback < speed_threshold) && (speed_feedback > (-1 * speed_threshold))) {
 		ret = CD_TRUE;
 	}
 	return ret;
