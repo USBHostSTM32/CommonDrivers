@@ -12,6 +12,8 @@
 
 #include "can_manager.h"
 
+#define MAX_CAN_OCCUPANCY_CNT						(3U)
+
 CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager, const can_manager_config_t *config) {
     CanManager_StatusTypeDef status = CAN_MANAGER_ERROR;
     if ((can_manager != NULL) && (config != NULL) && (config->hcan != NULL)) {
@@ -82,7 +84,7 @@ CanManager_StatusTypeDef __send_message(can_manager_t *can_manager, const uint8_
     		can_manager->max_can_occupancy_cnt = can_manager->can_occupancy_cnt;
     	}
 
-    	if(__abort_message(can_manager) == CAN_MANAGER_OK)
+    	if((__abort_message(can_manager) == CAN_MANAGER_OK)&&(can_manager->can_occupancy_cnt < MAX_CAN_OCCUPANCY_CNT))
     	{
     		status=__add_message_to_mailbox(can_manager, can_data);
     	}

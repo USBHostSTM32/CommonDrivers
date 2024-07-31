@@ -201,8 +201,13 @@ static inline uint16_t __calculate_speed(float current_speed, float set_point) {
  * @brief
  */
 static inline uint16_t __calculate_braking(float braking_module) {
-	return (uint16_t) roundf(
-			braking_module * ((float) AUTO_CONTROL_MAX_BRAKING));
+	uint16_t brake = (uint16_t) roundf(braking_module * ((float) AUTO_CONTROL_MAX_BRAKING));
+
+	if(brake > AUTO_CONTROL_MAX_BRAKING){
+		brake = AUTO_CONTROL_MAX_BRAKING;
+	}
+
+	return brake;
 }
 
 /**
