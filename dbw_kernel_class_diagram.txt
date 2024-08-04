@@ -1,0 +1,304 @@
+classDiagram
+%% Classe principale che aggrega o compone altre classi
+class dbw_kernel_t {
+  +osMessageQId urb_queueHandle
+  +uint8_t urb_queueBuffer[40]
+  +osStaticMessageQDef_t urb_queueControlBlock
+  +urb_sender_t urb_sender
+  +t818_drive_control_t drive_control
+  +auto_data_feedback_t auto_data_feedback
+  +auto_control_t auto_control
+  +pid_t pid
+  +rotation_manager_t rotation_manager
+  +can_manager_t can_manager
+}
+
+%% Composizione: dbw_kernel_t contiene in modo stretto le seguenti classi
+dbw_kernel_t *-- t818_drive_control_t
+dbw_kernel_t *-- auto_data_feedback_t
+dbw_kernel_t *-- auto_control_t
+dbw_kernel_t *-- pid_t
+dbw_kernel_t *-- rotation_manager_t
+dbw_kernel_t *-- can_manager_t
+dbw_kernel_t *-- urb_sender_t
+
+%% Definizione della struttura urb_sender_t
+class urb_sender_t {
+  +const urb_sender_config_t *config
+  +osMessageQId xQueue
+  +urb_interr_msg_t interr_buff
+}
+
+%% Definizione dello stato URBSender
+class URBSender_StatusTypeDef{
+  <<typedef>>
+}
+URBSender_StatusTypeDef : +URB_SENDER_OK
+URBSender_StatusTypeDef : +URB_SENDER_ERROR
+
+%% Classe di configurazione urb_sender
+class urb_sender_config_t {
+  +USBH_HandleTypeDef *phost
+}
+
+%% Struttura del messaggio di interrupt URB
+class urb_interr_msg_t {
+  +uint8 msg[URB_MESSAGE_DIM]
+  +uint8 pipe_num
+}
+
+%% Funzioni del urb sender
+class URBSenderFunctions{
+  +URBSender_StatusTypeDef urb_sender_init(urb_sender_t *urb_sender, const urb_sender_config_t *config, osMessageQId xQueue)
+  +URBSender_StatusTypeDef urb_sender_enqueue_msg(urb_sender_t *urb_sender, const urb_interr_msg_t *interr_msg)
+  +URBSender_StatusTypeDef urb_sender_dequeue_msg(urb_sender_t *urb_sender)
+}
+
+%% Classe t818_drive_control_t e le sue relazioni
+class t818_drive_control_t {
+  +HID_T818_Info_TypeDef *t818_info
+  +const t818_drive_control_config_t *config
+  +t818_driving_commands_t t818_driving_commands
+  +t818_drive_control_state state
+}
+
+%% Aggregazione: t818_drive_control_t ha puntatori verso le seguenti classi
+t818_drive_control_t o-- HID_T818_Info_TypeDef
+t818_drive_control_t o-- t818_drive_control_config_t
+t818_drive_control_t *-- t818_driving_commands_t
+t818_drive_control_t *-- t818_drive_control_state
+
+
+t818_driving_commands_t *-- DirectionalPadArrowPosition
+
+%% Definizione dello stato t818_drive_control
+class T818DriveControl_StatusTypeDef{
+  <<typedef>>
+}
+T818DriveControl_StatusTypeDef : +T818_DC_OK
+T818DriveControl_StatusTypeDef : +T818_DC_ERROR
+
+%% Classe di configurazione t818_drive_control
+class t818_drive_control_config_t {
+  +USBH_HandleTypeDef *t818_host_handle
+}
+
+%% Classe dei comandi di guida t818
+class t818_driving_commands_t {
+  +float wheel_steering_degree
+  +float braking_module
+  +float throttling_module
+  +float clutching_module
+  +button_t buttons[BUTTON_COUNT]
+  +DirectionalPadArrowPosition pad_arrow_position
+}
+
+%% Enumerazione per i pulsanti del pad direzionale
+class DirectionalPadArrowPosition{
+  <<enumeration>>
+}
+DirectionalPadArrowPosition : +DIRECTION_NONE
+DirectionalPadArrowPosition : +DIRECTION_UP
+DirectionalPadArrowPosition : +DIRECTION_DOWN
+DirectionalPadArrowPosition : +DIRECTION_LEFT
+DirectionalPadArrowPosition : +DIRECTION_RIGHT
+DirectionalPadArrowPosition : +DIRECTION_UP_LEFT
+DirectionalPadArrowPosition : +DIRECTION_UP_RIGHT
+DirectionalPadArrowPosition : +DIRECTION_DOWN_LEFT
+DirectionalPadArrowPosition : +DIRECTION_DOWN_RIGHT
+
+%% Enumerazione per lo stato del controllo di guida t818
+class t818_drive_control_state{
+  <<enumeration>>
+}
+t818_drive_control_state : +WAITING_WHEEL_CONFIGURATION
+t818_drive_control_state : +MANUAL_DRIVING
+t818_drive_control_state : +AUTONOMOUS_DRIVING
+
+%% Funzioni del kernel DBW
+class DBWKernelFunctions{
+  +dbw_kernel_t* const dbw_kernel_get_instance()
+  +DBWKernel_StatusTypeDef dbw_kernel_init()
+  +DBWKernel_StatusTypeDef dbw_kernel_update_state_step()
+  +DBWKernel_StatusTypeDef dbw_kernel_urb_tx_step()
+}
+
+%% Funzioni del controllo di guida t818
+class T818DriveControlFunctions{
+  +T818DriveControl_StatusTypeDef t818_drive_control_init(t818_drive_control_t *t818_drive_control, const t818_drive_control_config_t *t818_config, HID_T818_Info_TypeDef *t818_info)
+  +T818DriveControl_StatusTypeDef t818_drive_control_step(t818_drive_control_t *t818_drive_control, urb_sender_t *urb_sender, rotation_manager_t* rotation_manager, int16_t steer_feedback)
+}
+
+%% Definizione della struttura HID_T818_Info
+class HID_T818_Info_TypeDef {
+  +uint16_t wheel_rotation
+  +uint1616 brake
+  +uint1616 throttle
+  +uint16 clutch
+  +uint8 vx_axis
+  +uint8 vy_axis
+  +uint8 rx_axis
+  +uint8 ry_axis
+  +uint8 z_axis
+  +uint8 buttons[BUTTON_COUNT]
+  +uint8 pad_arrow
+}
+
+%% Definizione della struttura pid_t
+class pid_t {
+  +double ki
+  +double kp
+  +double kd
+  +double e_old
+  +double u_old
+  +double ukmax
+  +double ukmin
+  +double sk
+}
+
+%% Definizione dello stato PID
+class PID_StatusTypeDef{
+  <<typedef>>
+}
+PID_StatusTypeDef : +PID_OK
+PID_StatusTypeDef : +PID_ERROR
+
+%% Funzioni PID
+class PIDFunctions{
+  +PID_StatusTypeDef pid_init(pid_t *pid, double kp, double ki, double kd, double ukmin, double ukmax)
+  +PID_StatusTypeDef pid_calculate_output(pid_t *pid, double e, double *u)
+  +PID_StatusTypeDef pid_change_parameters(pid_t *pid, double kp, double ki, double kd)
+}
+
+%% Definizione della struttura auto_control_t
+class auto_control_t {
+  +auto_data_feedback_t *auto_data_feedback
+  +auto_control_data_t auto_control_data
+  +t818_driving_commands_t *driving_commands
+  +auto_control_state state
+}
+
+%% Aggregazione: auto_control_t ha puntatori verso le seguenti classi
+auto_control_t o-- auto_data_feedback_t
+auto_control_t *-- auto_control_data_t
+auto_control_t o-- t818_driving_commands_t
+auto_control_t *-- auto_control_state
+
+%% Definizione dello stato AutoControl
+class AutoControl_StatusTypeDef{
+  <<typedef>>
+}
+AutoControl_StatusTypeDef : +AUTO_CONTROL_OK
+AutoControl_StatusTypeDef : +AUTO_CONTROL_ERROR
+
+%% Funzioni del controllo automatico
+class AutoControlFunctions{
+  +AutoControl_StatusTypeDef auto_control_init(auto_control_t *auto_control, t818_driving_commands_t *driving_commands, auto_data_feedback_t *auto_data_feedback)
+  +AutoControl_StatusTypeDef auto_control_step(auto_control_t *auto_control)
+}
+
+%% Definizione dei dati di controllo automatico
+class auto_control_data_t {
+  +uint16 speed
+  +uint16 braking
+  +int16 steering
+  +uint8 gear_shift
+  +uint8 mode_selection
+  +bool8u EBP
+  +bool8u front_light
+  +bool8u left_light
+  +bool8u right_light
+  +bool8u speed_mode
+  +bool8u state_control
+  +bool8u advanced_mode
+  +bool8u self_driving
+}
+
+%% Enumerazione per lo stato del controllo automatico
+class auto_control_state{
+  <<enumeration>>
+}
+auto_control_state : +PARKING
+auto_control_state : +RETRO
+auto_control_state : +NEUTRAL
+auto_control_state : +DRIVE
+
+%% Definizione del feedback dei dati automatici
+class auto_data_feedback_t {
+  +int16 speed
+  +int16 steer
+  +uint16 braking
+  +uint8 gear :2
+  +uint8 mode :2
+  +uint8 l_steer_light :1
+  +uint8 r_steer_light :1
+  +uint8 tail_light :1
+  +uint8 braking_light :1
+  +uint8 vehicle_status :1
+  +uint8 vehicle_mode :1
+  +uint8 emergency_stop :1
+}
+
+%% Definizione dello stato AutoDataFeedback
+class AutoDataFeedback_StatusTypeDef{
+  <<typedef>>
+}
+AutoDataFeedback_StatusTypeDef : +AUTO_DATA_FEEDBACK_OK
+AutoDataFeedback_StatusTypeDef : +AUTO_DATA_FEEDBACK_ERROR
+
+%% Funzioni del feedback dei dati automatici
+class AutoDataFeedbackFunctions{
+  +AutoDataFeedback_StatusTypeDef auto_data_feedback_init(auto_data_feedback_t *auto_data_feedback)
+}
+
+%% Definizione della struttura rotation_manager_t
+class rotation_manager_t {
+  +pid_t *pid
+  +urb_sender_t *urb_sender
+}
+
+%% Definizione dello stato RotationManager
+class Rotation_Manager_StatusTypeDef{
+  <<typedef>>
+}
+Rotation_Manager_StatusTypeDef : +ROTATION_MANAGER_OK
+Rotation_Manager_StatusTypeDef : +ROTATION_MANAGER_ERROR
+
+%% Funzioni del rotation manager
+class RotationManagerFunctions{
+  +Rotation_Manager_StatusTypeDef rotation_manager_init(rotation_manager_t *rotation_manager, pid_t *pid, urb_sender_t *urb_sender)
+  +Rotation_Manager_StatusTypeDef rotation_manager_update(rotation_manager_t *rotation_manager, double auto_steer_feedback, double auto_control_steer)
+}
+rotation_manager_t o-- urb_sender_t
+
+%% Definizione della struttura can_manager_t
+class can_manager_t {
+  +const can_manager_config_t *config
+  +uint32 auto_control_tx_mailbox
+  +CAN_RxHeaderTypeDef RxHeader
+  +uint8 tx_data[CAN_MANAGER_TX_DATA_SIZE]
+  +uint8 rx_data[CAN_MANAGER_RX_DATA_SIZE]
+  +uint32 max_can_occupancy_cnt
+  +uint32 can_occupancy_cnt
+}
+
+%% Definizione dello stato CanManager
+class CanManager_StatusTypeDef{
+  <<typedef>>
+}
+CanManager_StatusTypeDef : +CAN_MANAGER_OK
+CanManager_StatusTypeDef : +CAN_MANAGER_ERROR
+
+%% Classe di configurazione can_manager
+class can_manager_config_t {
+  +CAN_HandleTypeDef *hcan
+  +const CAN_TxHeaderTypeDef auto_control_tx_header
+  +uint32 auto_data_feedback_rx_fifo
+  +uint32 auto_data_feedback_rx_interrupt
+}
+
+%% Funzioni del can manager
+class CanManagerFunctions{
+  +CanManager_StatusTypeDef can_manager_init(can_manager_t *can_manager, const can_manager_config_t *config)
+  +CanManager_StatusTypeDef can_manager_auto_control_tx(can_manager_t *can_manager, const uint8 *can_data)
+}
